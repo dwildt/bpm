@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="8-bit style BPM calculator - tap the button or press spacebar to find the tempo">
+    <title>BPM Calculator</title>
+
+    <!-- Google Fonts - Press Start 2P for 8-bit aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">BPM CALCULATOR</h1>
+        </header>
+
+        <main class="main">
+            <!-- BPM Display -->
+            <div class="bpm-display">
+                <div class="bpm-label">BPM</div>
+                <div class="bpm-value" id="bpmValue">---</div>
+            </div>
+
+            <!-- Tap Button -->
+            <button class="tap-button" id="tapButton" aria-label="Tap to calculate BPM">
+                <span class="tap-text">TAP HERE</span>
+                <span class="tap-hint">(or spacebar)</span>
+            </button>
+
+            <!-- Info Section -->
+            <div class="info-section">
+                <div class="tap-count">
+                    <span class="info-label">TAPS:</span>
+                    <span class="info-value" id="tapCount">0</span>
+                </div>
+
+                <button class="reset-button" id="resetButton" aria-label="Reset calculator">
+                    RESET
+                </button>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions">
+                <p>Click the button or press SPACEBAR to tap along with the beat.</p>
+                <p>The BPM will be calculated automatically.</p>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Made with retro vibes | Built with <a href="https://claude.ai/code" target="_blank" rel="noopener">Claude Code</a></p>
+            <p>
+                <a href="https://github.com/dwildt/bpm" target="_blank" rel="noopener">View on GitHub</a> |
+                <a href="https://github.com/sponsors/dwildt" target="_blank" rel="noopener">Sponsor</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="bpm.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

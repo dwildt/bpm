@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# JavaScript
+node_modules/
+npm-debug.log
+
+# Testing
+coverage/

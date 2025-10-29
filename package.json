@@ -1,0 +1,26 @@
+{
+  "name": "bpm",
+  "version": "1.0.0",
+  "description": "Find the current BPM (Beats Per Minute) of any song by tapping along to the beat. Built with a retro 8-bit game aesthetic.",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dwildt/bpm.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/dwildt/bpm/issues"
+  },
+  "homepage": "https://github.com/dwildt/bpm#readme",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
