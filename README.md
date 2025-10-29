@@ -52,6 +52,42 @@ npx serve -p 8081
 http://localhost:8081
 ```
 
+### Testing
+
+The project uses Jest for unit testing:
+
+```bash
+# Install dependencies
+npm install
+
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+```
+
+### Linting
+
+The project uses ESLint to maintain code quality:
+
+```bash
+# Check for linting errors
+npm run lint
+
+# Auto-fix linting issues
+npm run lint:fix
+```
+
+ESLint configuration is in `eslint.config.js` and enforces:
+- Consistent code style
+- ES2021+ syntax
+- Browser and Node.js environments
+- Jest testing environment
+
 ## Deployment to GitHub Pages
 
 1. **Push your code to GitHub**:
@@ -78,6 +114,8 @@ bpm/
 ├── index.html      # Main HTML structure
 ├── styles.css      # 8-bit aesthetic styles
 ├── app.js          # BPM calculation logic
+├── package.json    # Node.js dependencies and scripts
+├── eslint.config.js # ESLint configuration
 ├── claude.md       # Claude Code development notes
 ├── tasks/          # Project planning documents
 │   └── plan.md
@@ -100,6 +138,11 @@ The BPM calculator uses a simple but effective algorithm:
 - **CSS3**: Custom properties, flexbox, animations
 - **Vanilla JavaScript**: No frameworks or dependencies
 - **Google Fonts**: Press Start 2P for 8-bit typography
+
+### Development Tools
+
+- **Jest**: Unit testing framework for JavaScript
+- **ESLint**: Code quality and linting tool
 
 ## Browser Support
 

@@ -4,7 +4,9 @@
 Build a BPM (Beats Per Minute) calculator with an 8-bit game aesthetic that runs on GitHub Pages.
 
 ## Technology Stack
-**Vanilla JavaScript** 
+**Vanilla JavaScript**
+- **Testing**: Jest for unit testing
+- **Linting**: ESLint for code quality and consistency 
 
 ## File Structure
 ```
@@ -15,8 +17,25 @@ bpm/
 ├── styles.css          # 8-bit game styling
 ├── app.js             # BPM calculation logic
 ├── claude.md          # Claude Code development notes
+├── package.json       # Node.js dependencies and scripts
+├── eslint.config.js   # ESLint configuration
 └── README.md          # Project documentation
 ```
+
+## Development Tools
+
+### Testing with Jest
+- Unit tests for BPM calculation logic
+- Run tests: `npm test`
+- Watch mode: `npm run test:watch`
+- Coverage report: `npm run test:coverage`
+
+### Code Quality with ESLint
+- Enforce consistent code style
+- Catch potential errors early
+- Run linter: `npm run lint`
+- Auto-fix issues: `npm run lint:fix`
+- Configuration: `eslint.config.js`
 
 ## Core Features
 
@@ -67,6 +86,9 @@ bpm/
 8. ✅ Add footer with GitHub repo, sponsor link, and Claude Code credit
 9. ✅ Create claude.md documentation
 10. ✅ Update tasks/plan.md with completion status
+11. ✅ Set up Jest for unit testing
+12. ✅ Set up ESLint for code quality
+13. ✅ Update documentation with testing and linting information
 
 ## Status: ✅ COMPLETED
 
