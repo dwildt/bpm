@@ -129,8 +129,76 @@ elements.resetButton.addEventListener('keydown', (e) => {
 });
 
 // ============================================
+// THEME MANAGEMENT
+// ============================================
+
+/**
+ * Theme system with localStorage persistence
+ */
+const ThemeManager = {
+  storageKey: 'bpm-theme',
+  defaultTheme: 'classic',
+  themeButtons: document.querySelectorAll('.theme-button'),
+
+  /**
+   * Get the current theme from localStorage or default
+   */
+  getCurrentTheme() {
+    return localStorage.getItem(this.storageKey) || this.defaultTheme;
+  },
+
+  /**
+   * Set the theme and save to localStorage
+   */
+  setTheme(themeName) {
+    // Update HTML data-theme attribute
+    document.documentElement.setAttribute('data-theme', themeName);
+
+    // Save to localStorage
+    localStorage.setItem(this.storageKey, themeName);
+
+    // Update UI - mark active button
+    this.updateActiveButton(themeName);
+  },
+
+  /**
+   * Update the active state of theme buttons
+   */
+  updateActiveButton(themeName) {
+    this.themeButtons.forEach(button => {
+      if (button.dataset.theme === themeName) {
+        button.classList.add('active');
+      } else {
+        button.classList.remove('active');
+      }
+    });
+  },
+
+  /**
+   * Initialize theme system
+   */
+  init() {
+    // Load saved theme or use default
+    const savedTheme = this.getCurrentTheme();
+    this.setTheme(savedTheme);
+
+    // Add click handlers to theme buttons
+    this.themeButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const theme = button.dataset.theme;
+        this.setTheme(theme);
+      });
+    });
+  }
+};
+
+// ============================================
 // INITIALIZATION
 // ============================================
 
 // Initialize display
 updateDisplay();
+
+// Initialize theme system
+ThemeManager.init();
