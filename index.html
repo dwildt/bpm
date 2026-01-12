@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="8-bit style BPM calculator - tap the button or press spacebar to find the tempo">
     <title>BPM Calculator</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect fill='%2300ff00' width='16' height='16'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='12' fill='%23000'>♪</text></svg>">
 
     <!-- Google Fonts - Press Start 2P for 8-bit aesthetic -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,6 +32,35 @@
                 <span class="tap-text">TAP HERE</span>
                 <span class="tap-hint">(or spacebar)</span>
             </button>
+
+            <!-- Metronome Controls Section -->
+            <div class="metronome-section">
+                <button class="fix-bpm-button" id="fixBpmButton"
+                        aria-label="Lock current BPM for metronome"
+                        disabled>
+                    FIX BPM
+                </button>
+
+                <div class="metronome-display">
+                    <span class="metronome-label">FIXED:</span>
+                    <span class="metronome-value" id="fixedBpmValue">---</span>
+                </div>
+
+                <button class="play-metronome-button" id="playMetronomeButton"
+                        aria-label="Start metronome"
+                        disabled>
+                    <span class="play-icon">▶</span>
+                    <span class="play-text">PLAY</span>
+                </button>
+            </div>
+
+            <!-- Beat Indicator -->
+            <div class="beat-indicator" id="beatIndicator">
+                <div class="beat-dot" data-beat="0"></div>
+                <div class="beat-dot" data-beat="1"></div>
+                <div class="beat-dot" data-beat="2"></div>
+                <div class="beat-dot" data-beat="3"></div>
+            </div>
 
             <!-- Info Section -->
             <div class="info-section">
@@ -81,6 +111,7 @@
     </div>
 
     <script src="bpm.js"></script>
+    <script src="metronome.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
