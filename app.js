@@ -12,8 +12,11 @@ const state = {
   fixedBPM: null,              // Locked BPM value (null = not fixed)
   metronomeActive: false,      // Whether metronome is playing
   metronomeTimer: null,        // setInterval reference
-  currentBeat: 0,              // Current beat in measure (0-3 for 4/4)
+  currentBeat: 0,              // Current beat in measure (0-based index)
   audioContext: null,          // Web Audio API context (lazy initialized)
+  // Time signature state
+  timeSignature: '4/4',        // Current time signature
+  beatsPerMeasure: 4,          // Number of beats in current time signature
 };
 
 // DOM Elements
@@ -34,6 +37,8 @@ const elements = {
   confirmBpmButton: document.getElementById('confirmBpmButton'),
   cancelBpmButton: document.getElementById('cancelBpmButton'),
   bpmError: document.getElementById('bpmError'),
+  // Time signature elements
+  timeSignatureSelector: document.getElementById('timeSignatureSelector'),
 };
 
 // ============================================
@@ -237,8 +242,9 @@ function playMetronomeBeat() {
     return;
   }
 
-  const frequency = MetronomeLogic.getFrequencyForBeat(state.currentBeat);
-  const isAccent = state.currentBeat === 0;
+  // Get frequency based on current beat and time signature
+  const frequency = MetronomeLogic.getFrequencyForBeat(state.currentBeat, state.timeSignature);
+  const isAccent = MetronomeLogic.isAccentedBeat(state.currentBeat, state.timeSignature);
 
   try {
     MetronomeLogic.playBeep(state.audioContext, frequency, 0.05, isAccent);
@@ -249,8 +255,8 @@ function playMetronomeBeat() {
   // Update visual indicator
   updateBeatIndicator();
 
-  // Advance to next beat (wrap around at 4 for 4/4 time)
-  state.currentBeat = (state.currentBeat + 1) % 4;
+  // Advance to next beat (wrap around based on beats per measure)
+  state.currentBeat = (state.currentBeat + 1) % state.beatsPerMeasure;
 }
 
 /**
@@ -460,6 +466,60 @@ function updateSetBpmButtonState() {
 }
 
 // ============================================
+// TIME SIGNATURE FUNCTIONS
+// ============================================
+
+/**
+ * Change time signature
+ * @param {string} newTimeSignature - Time signature (e.g., "3/4", "6/8")
+ */
+function changeTimeSignature(newTimeSignature) {
+  // Can't change time signature while metronome is playing
+  if (state.metronomeActive) {
+    console.warn('Cannot change time signature while metronome is playing');
+    return;
+  }
+
+  try {
+    // Validate time signature exists
+    const config = MetronomeLogic.getTimeSignatureConfig(newTimeSignature);
+
+    // Update state
+    state.timeSignature = newTimeSignature;
+    state.beatsPerMeasure = config.beatsPerMeasure;
+    state.currentBeat = 0;
+
+    // Update beat indicator to show correct number of dots
+    updateBeatIndicatorDots();
+
+    console.log(`Changed time signature to ${newTimeSignature} (${config.label})`);
+  } catch (error) {
+    console.error('Error changing time signature:', error);
+  }
+}
+
+/**
+ * Update beat indicator dots based on current time signature
+ */
+function updateBeatIndicatorDots() {
+  const beatIndicator = elements.beatIndicator;
+
+  // Clear existing dots
+  beatIndicator.innerHTML = '';
+
+  // Create dots for current time signature
+  for (let i = 0; i < state.beatsPerMeasure; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'beat-dot';
+    dot.setAttribute('data-beat', i);
+    beatIndicator.appendChild(dot);
+  }
+
+  // Update active dot
+  updateBeatIndicator();
+}
+
+// ============================================
 // EVENT LISTENERS
 // ============================================
 
@@ -597,6 +657,14 @@ elements.setBpmButton.addEventListener('keydown', (e) => {
   if (e.code === 'Space' || e.key === ' ') {
     e.stopPropagation();
   }
+});
+
+/**
+ * Handle time signature selection change
+ */
+elements.timeSignatureSelector.addEventListener('change', (e) => {
+  e.preventDefault();
+  changeTimeSignature(e.target.value);
 });
 
 /**

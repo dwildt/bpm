@@ -11,9 +11,10 @@ Find the current BPM (Beats Per Minute) of any song by tapping along to the beat
 - **Tap Detection**: Click the button or press spacebar to tap along with music
 - **Real-time BPM Calculation**: Automatic calculation based on tap intervals
 - **Manual BPM Input**: Directly enter a BPM value for instant metronome use
-- **Metronome**: Lock a BPM and play audible clicks in 4/4 time with accented downbeats
+- **Metronome**: Lock a BPM and play audible clicks with multiple time signatures
+- **Multiple Time Signatures**: Support for 4/4, 3/4, 2/4, and 6/8 time signatures
 - **8-bit Audio**: Retro square wave beeps generated with Web Audio API
-- **Visual Beat Indicator**: See the current beat position while the metronome plays
+- **Visual Beat Indicator**: Dynamic display showing the current beat position
 - **8-bit Aesthetic**: Retro game-inspired UI with neon colors and pixel fonts
 - **Three Themes**: Classic, Severance, and Wildtech color schemes
 - **Auto-reset**: Automatically resets after 3 seconds of inactivity
@@ -38,13 +39,17 @@ Visit the live demo: [https://dwildt.github.io/bpm/](https://dwildt.github.io/bp
 
 1. Tap to calculate a BPM (at least 2 taps required)
 2. Click **FIX BPM** to lock the current BPM value
-3. Click **PLAY** to start the metronome
-4. The metronome will play in 4/4 time with:
-   - Beat 1 (downbeat): Higher pitch (1000 Hz) and louder
-   - Beats 2-4: Lower pitch (800 Hz) and quieter
-5. Visual beat indicator shows the current beat position
-6. Click **STOP** to stop playback
-7. Click **UNLOCK** to unlock the BPM and measure a new tempo
+3. Select your desired **TIME SIGNATURE** from the dropdown
+4. Click **PLAY** to start the metronome
+5. The metronome will play with accent patterns:
+   - Primary accent (downbeat): 1000 Hz, louder
+   - Secondary accent (compound meters): 900 Hz, medium
+   - Regular beats: 800 Hz, quieter
+6. Visual beat indicator shows the current beat position
+7. Click **STOP** to stop playback
+8. Click **UNLOCK** to unlock the BPM and measure a new tempo
+
+**Note**: Time signature can only be changed when the metronome is stopped.
 
 ### Setting BPM Manually
 
@@ -179,11 +184,34 @@ The metronome uses Web Audio API for precise audio timing:
 
 1. **Audio Generation**: Square wave oscillators create 8-bit style beeps
 2. **Timing**: `setInterval` schedules beats, Web Audio API plays them precisely
-3. **4/4 Time Signature**:
-   - Beat 0 (downbeat): 1000 Hz frequency, 0.3 volume
-   - Beats 1-3: 800 Hz frequency, 0.15 volume
-4. **Visual Feedback**: Beat indicator syncs with audio playback
-5. **BPM Range**: Validates BPM between 30-300 for practical metronome use
+3. **Time Signature Support**:
+   - **4/4 (Common Time)**: 4 beats per measure, accent on beat 1
+   - **3/4 (Waltz)**: 3 beats per measure, accent on beat 1
+   - **2/4 (March)**: 2 beats per measure, accent on beat 1
+   - **6/8 (Compound)**: 2 main beats, accents on beats 1 and 2
+4. **Accent Patterns**:
+   - Primary accent (beat 1): 1000 Hz frequency, 0.3 volume
+   - Secondary accent (beat 2 in 6/8): 900 Hz frequency, 0.2 volume
+   - Regular beats: 800 Hz frequency, 0.15 volume
+5. **Visual Feedback**: Beat indicator dynamically adjusts to show correct number of beats
+6. **BPM Range**: Validates BPM between 30-300 for practical metronome use
+
+### Time Signatures
+
+The calculator supports four essential time signatures:
+
+| Time Signature | Beats | Description | Use Cases |
+|----------------|-------|-------------|-----------|
+| **4/4** | 4 | Common Time | Most popular music, rock, pop, marches |
+| **3/4** | 3 | Waltz Time | Waltzes, folk music, ballads, country |
+| **2/4** | 2 | March Time | Polkas, marches, simple dance music |
+| **6/8** | 2 | Compound Duple | Irish jigs, rock ballads, folk, flowing feel |
+
+**Accent Patterns:**
+- **4/4, 3/4, 2/4**: Accent on beat 1 (downbeat) only
+- **6/8**: Primary accent on beat 1, secondary accent on beat 2
+
+The time signature selector allows you to choose the appropriate meter for your practice session. The visual beat indicator and audio accents automatically adjust to match the selected time signature.
 
 ## Technologies Used
 

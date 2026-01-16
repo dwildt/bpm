@@ -5,6 +5,62 @@
  */
 
 /**
+ * Time Signature Configuration
+ * Defines available time signatures with their characteristics
+ */
+const TIME_SIGNATURES = {
+  '4/4': {
+    beatsPerMeasure: 4,
+    primaryAccent: [0],      // Beat 1 gets primary accent
+    secondaryAccent: [],     // No secondary accents
+    label: '4/4 (Common Time)',
+    description: 'Most common time signature, marching feel'
+  },
+  '3/4': {
+    beatsPerMeasure: 3,
+    primaryAccent: [0],      // Beat 1 gets primary accent
+    secondaryAccent: [],     // No secondary accents
+    label: '3/4 (Waltz)',
+    description: 'Waltz time, flowing feel'
+  },
+  '2/4': {
+    beatsPerMeasure: 2,
+    primaryAccent: [0],      // Beat 1 gets primary accent
+    secondaryAccent: [],     // No secondary accents
+    label: '2/4 (March)',
+    description: 'March time, bouncy feel'
+  },
+  '6/8': {
+    beatsPerMeasure: 2,
+    primaryAccent: [0],      // Beat 1 gets primary accent
+    secondaryAccent: [1],    // Beat 2 gets secondary accent
+    label: '6/8 (Compound)',
+    description: 'Compound duple, rolling feel'
+  }
+};
+
+/**
+ * Get time signature configuration
+ * @param {string} timeSignature - Time signature (e.g., "4/4", "3/4")
+ * @returns {object} Time signature configuration
+ */
+function getTimeSignatureConfig(timeSignature) {
+  const config = TIME_SIGNATURES[timeSignature];
+  if (!config) {
+    throw new Error(`Unknown time signature: ${timeSignature}`);
+  }
+  return config;
+}
+
+/**
+ * Get list of available time signatures
+ * @returns {Array<string>} Array of time signature keys
+ */
+function getAvailableTimeSignatures() {
+  return Object.keys(TIME_SIGNATURES);
+}
+
+/**
  * Create and initialize Web Audio API context
  * @returns {AudioContext} Audio context instance
  */
@@ -71,13 +127,38 @@ function calculateInterval(bpm) {
 }
 
 /**
- * Get frequency for beat based on position in measure (4/4 time)
- * @param {number} beatIndex - Beat position (0-3 for 4/4)
+ * Get frequency for beat based on position in measure and accent pattern
+ * @param {number} beatIndex - Beat position (0-based)
+ * @param {string} timeSignature - Time signature (e.g., "4/4", "3/4")
  * @returns {number} Frequency in Hz
  */
-function getFrequencyForBeat(beatIndex) {
-  // Beat 0 (downbeat) is higher pitch, others are lower
-  return beatIndex === 0 ? 1000 : 800;
+function getFrequencyForBeat(beatIndex, timeSignature = '4/4') {
+  const config = getTimeSignatureConfig(timeSignature);
+
+  // Primary accent (beat 1): 1000 Hz
+  if (config.primaryAccent.includes(beatIndex)) {
+    return 1000;
+  }
+
+  // Secondary accent (e.g., beat 2 in 6/8): 900 Hz
+  if (config.secondaryAccent.includes(beatIndex)) {
+    return 900;
+  }
+
+  // Regular beat: 800 Hz
+  return 800;
+}
+
+/**
+ * Check if beat should be accented (primary or secondary)
+ * @param {number} beatIndex - Beat position (0-based)
+ * @param {string} timeSignature - Time signature (e.g., "4/4", "3/4")
+ * @returns {boolean} True if beat should be accented
+ */
+function isAccentedBeat(beatIndex, timeSignature = '4/4') {
+  const config = getTimeSignatureConfig(timeSignature);
+  return config.primaryAccent.includes(beatIndex) ||
+         config.secondaryAccent.includes(beatIndex);
 }
 
 /**
@@ -96,7 +177,11 @@ if (typeof window !== 'undefined') {
     playBeep,
     calculateInterval,
     getFrequencyForBeat,
-    isValidMetronomeBPM
+    isAccentedBeat,
+    isValidMetronomeBPM,
+    getTimeSignatureConfig,
+    getAvailableTimeSignatures,
+    TIME_SIGNATURES
   };
 }
 
@@ -107,6 +192,10 @@ if (typeof module !== 'undefined' && module.exports) {
     playBeep,
     calculateInterval,
     getFrequencyForBeat,
-    isValidMetronomeBPM
+    isAccentedBeat,
+    isValidMetronomeBPM,
+    getTimeSignatureConfig,
+    getAvailableTimeSignatures,
+    TIME_SIGNATURES
   };
 }

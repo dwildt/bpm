@@ -470,6 +470,67 @@ body {
 }
 
 /* ============================================
+   TIME SIGNATURE SELECTOR
+   ============================================ */
+
+/* Time Signature Section */
+.time-signature-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+    border: 2px dashed var(--color-border);
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.time-sig-label {
+    font-family: var(--font-main);
+    font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+    color: var(--color-accent);
+    letter-spacing: 0.1em;
+    text-align: center;
+}
+
+.time-sig-selector {
+    width: 100%;
+    font-family: var(--font-main);
+    font-size: clamp(0.6rem, 2vw, 0.8rem);
+    padding: var(--spacing-sm);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: var(--color-primary);
+    border: 2px solid var(--color-accent);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.time-sig-selector:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 10px var(--color-accent-glow);
+}
+
+.time-sig-selector:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 15px var(--color-shadow);
+}
+
+.time-sig-selector:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Style the dropdown options */
+.time-sig-selector option {
+    background-color: var(--color-bg);
+    color: var(--color-primary);
+    padding: var(--spacing-sm);
+}
+
+/* ============================================
    MODAL STYLING
    ============================================ */
 
