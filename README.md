@@ -10,6 +10,7 @@ Find the current BPM (Beats Per Minute) of any song by tapping along to the beat
 
 - **Tap Detection**: Click the button or press spacebar to tap along with music
 - **Real-time BPM Calculation**: Automatic calculation based on tap intervals
+- **Manual BPM Input**: Directly enter a BPM value for instant metronome use
 - **Metronome**: Lock a BPM and play audible clicks in 4/4 time with accented downbeats
 - **8-bit Audio**: Retro square wave beeps generated with Web Audio API
 - **Visual Beat Indicator**: See the current beat position while the metronome plays
@@ -44,6 +45,21 @@ Visit the live demo: [https://dwildt.github.io/bpm/](https://dwildt.github.io/bp
 5. Visual beat indicator shows the current beat position
 6. Click **STOP** to stop playback
 7. Click **UNLOCK** to unlock the BPM and measure a new tempo
+
+### Setting BPM Manually
+
+If you already know the desired BPM, you can enter it directly:
+
+1. Click the **SET BPM** button
+2. Enter a BPM value between 30 and 300
+3. Press **Enter** or click **OK**
+4. The BPM is automatically locked and ready to play
+5. Click **PLAY** to start the metronome immediately
+
+**Keyboard shortcuts in modal:**
+- **Enter**: Confirm and set BPM
+- **Escape**: Cancel and close modal
+- **Tab**: Navigate between input and buttons
 
 ## Local Development
 

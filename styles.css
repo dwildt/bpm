@@ -429,6 +429,207 @@ body {
     }
 }
 
+/* ============================================
+   MANUAL BPM INPUT SECTION
+   ============================================ */
+
+/* Manual BPM Input Section */
+.manual-bpm-section {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 400px;
+    margin-top: var(--spacing-sm);
+}
+
+.set-bpm-button {
+    font-family: var(--font-main);
+    font-size: clamp(0.6rem, 2vw, 0.8rem);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: transparent;
+    color: var(--color-accent);
+    border: 2px solid var(--color-accent);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+}
+
+.set-bpm-button:hover:not(:disabled) {
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    box-shadow: 0 0 10px var(--color-accent-glow);
+}
+
+.set-bpm-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.set-bpm-button:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+/* ============================================
+   MODAL STYLING
+   ============================================ */
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-overlay[hidden] {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal Content */
+.modal-content {
+    max-width: 500px;
+    width: 90%;
+    background-color: var(--color-bg);
+    border: 4px solid var(--color-primary);
+    box-shadow: 0 0 30px var(--color-shadow);
+    padding: var(--spacing-md);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-title {
+    font-family: var(--font-main);
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    color: var(--color-primary);
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+    text-shadow: 0 0 10px var(--color-shadow);
+}
+
+.modal-body {
+    margin-bottom: var(--spacing-md);
+}
+
+.modal-label {
+    display: block;
+    font-family: var(--font-main);
+    font-size: clamp(0.6rem, 2vw, 0.8rem);
+    color: var(--color-accent);
+    margin-bottom: var(--spacing-sm);
+}
+
+.bpm-input {
+    width: 100%;
+    font-family: var(--font-main);
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    padding: var(--spacing-sm);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: var(--color-primary);
+    border: 3px solid var(--color-accent);
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.bpm-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 15px var(--color-shadow);
+}
+
+.bpm-input::placeholder {
+    color: var(--color-text);
+    opacity: 0.3;
+}
+
+/* Remove number input arrows for cleaner 8-bit aesthetic */
+.bpm-input::-webkit-outer-spin-button,
+.bpm-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.bpm-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.modal-error {
+    min-height: 1.5rem;
+    font-family: var(--font-main);
+    font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+    color: var(--color-secondary);
+    margin-top: var(--spacing-xs);
+    text-align: center;
+}
+
+.modal-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.modal-button {
+    flex: 1;
+    font-family: var(--font-main);
+    font-size: clamp(0.6rem, 2vw, 0.8rem);
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid;
+}
+
+.modal-confirm {
+    background-color: var(--color-primary);
+    color: var(--color-bg);
+    border-color: var(--color-primary);
+}
+
+.modal-confirm:hover {
+    background-color: var(--color-button-light);
+    border-color: var(--color-button-light);
+    box-shadow: 0 0 15px var(--color-shadow);
+}
+
+.modal-cancel {
+    background-color: transparent;
+    color: var(--color-secondary);
+    border-color: var(--color-secondary);
+}
+
+.modal-cancel:hover {
+    background-color: var(--color-secondary);
+    color: var(--color-bg);
+    box-shadow: 0 0 10px var(--color-secondary);
+}
+
+.modal-button:active {
+    transform: scale(0.95);
+}
+
 /* Instructions */
 .instructions {
     margin-top: var(--spacing-md);

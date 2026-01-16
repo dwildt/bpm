@@ -54,6 +54,38 @@
                 </button>
             </div>
 
+            <!-- Manual BPM Input Section -->
+            <div class="manual-bpm-section">
+                <button class="set-bpm-button" id="setBpmButton"
+                        aria-label="Set BPM manually">
+                    SET BPM
+                </button>
+            </div>
+
+            <!-- BPM Input Modal -->
+            <div class="modal-overlay" id="bpmModal" hidden>
+                <div class="modal-content" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+                    <h2 class="modal-title" id="modalTitle">SET BPM</h2>
+                    <div class="modal-body">
+                        <label for="bpmInput" class="modal-label">ENTER BPM (30-300):</label>
+                        <input type="number"
+                               id="bpmInput"
+                               class="bpm-input"
+                               min="30"
+                               max="300"
+                               step="1"
+                               placeholder="120"
+                               aria-describedby="bpmError"
+                               autocomplete="off">
+                        <div class="modal-error" id="bpmError" role="alert"></div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="modal-button modal-confirm" id="confirmBpmButton">OK</button>
+                        <button class="modal-button modal-cancel" id="cancelBpmButton">CANCEL</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Beat Indicator -->
             <div class="beat-indicator" id="beatIndicator">
                 <div class="beat-dot" data-beat="0"></div>

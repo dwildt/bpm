@@ -64,6 +64,7 @@ Claude Code built the entire application systematically:
 
 - **Tap Detection**: Both mouse and keyboard (spacebar) support
 - **BPM Calculation**: Real-time calculation using timestamp intervals
+- **Manual BPM Input**: Direct BPM entry via modal dialog with validation
 - **Visual Feedback**: Button animations, glow effects, color changes
 - **Auto-reset**: Automatic reset after 3 seconds of inactivity
 - **Responsive Design**: Works on all screen sizes

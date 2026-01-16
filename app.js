@@ -27,6 +27,13 @@ const elements = {
   playMetronomeButton: document.getElementById('playMetronomeButton'),
   fixedBpmValue: document.getElementById('fixedBpmValue'),
   beatIndicator: document.getElementById('beatIndicator'),
+  // Manual BPM elements
+  setBpmButton: document.getElementById('setBpmButton'),
+  bpmModal: document.getElementById('bpmModal'),
+  bpmInput: document.getElementById('bpmInput'),
+  confirmBpmButton: document.getElementById('confirmBpmButton'),
+  cancelBpmButton: document.getElementById('cancelBpmButton'),
+  bpmError: document.getElementById('bpmError'),
 };
 
 // ============================================
@@ -64,6 +71,9 @@ function updateDisplay() {
 
   // Update metronome display
   updateMetronomeDisplay();
+
+  // Update SET BPM button state
+  updateSetBpmButtonState();
 }
 
 /**
@@ -281,6 +291,9 @@ function startMetronome() {
     // Disable fix button while playing
     elements.fixBpmButton.disabled = true;
 
+    // Disable SET BPM button while playing
+    updateSetBpmButtonState();
+
     // Play first beat immediately
     playMetronomeBeat();
 
@@ -323,6 +336,9 @@ function stopMetronome() {
 
   // Re-enable fix button
   elements.fixBpmButton.disabled = false;
+
+  // Re-enable SET BPM button
+  updateSetBpmButtonState();
 }
 
 /**
@@ -333,6 +349,113 @@ function toggleMetronome() {
     stopMetronome();
   } else {
     startMetronome();
+  }
+}
+
+// ============================================
+// MANUAL BPM INPUT FUNCTIONS
+// ============================================
+
+/**
+ * Open the BPM input modal
+ */
+function openBpmModal() {
+  // Clear previous input and errors
+  elements.bpmInput.value = '';
+  elements.bpmError.textContent = '';
+
+  // Show modal
+  elements.bpmModal.hidden = false;
+
+  // Focus input for immediate typing
+  elements.bpmInput.focus();
+}
+
+/**
+ * Close the BPM input modal
+ */
+function closeBpmModal() {
+  elements.bpmModal.hidden = true;
+  elements.bpmInput.value = '';
+  elements.bpmError.textContent = '';
+}
+
+/**
+ * Validate and apply manual BPM input
+ */
+function applyManualBPM() {
+  const inputValue = elements.bpmInput.value.trim();
+
+  // Check if empty
+  if (inputValue === '') {
+    elements.bpmError.textContent = 'Please enter a BPM value';
+    elements.bpmInput.focus();
+    return;
+  }
+
+  const bpm = parseInt(inputValue, 10);
+
+  // Check if valid number
+  if (isNaN(bpm)) {
+    elements.bpmError.textContent = 'Invalid number';
+    elements.bpmInput.focus();
+    return;
+  }
+
+  // Validate range using existing metronome validation
+  if (!MetronomeLogic.isValidMetronomeBPM(bpm)) {
+    elements.bpmError.textContent = 'BPM must be between 30 and 300';
+    elements.bpmInput.focus();
+    return;
+  }
+
+  // Valid BPM - apply it
+  setManualBPM(bpm);
+  closeBpmModal();
+}
+
+/**
+ * Set a manual BPM value and prepare for metronome playback
+ * @param {number} bpm - The BPM value to set
+ */
+function setManualBPM(bpm) {
+  // Clear any pending auto-reset timer
+  if (state.resetTimer) {
+    clearTimeout(state.resetTimer);
+    state.resetTimer = null;
+  }
+
+  // Clear existing taps
+  state.taps = [];
+
+  // Set fixed BPM directly
+  state.fixedBPM = bpm;
+
+  // Update displays
+  updateDisplay();
+  updateMetronomeDisplay();
+
+  // Enable play button
+  elements.playMetronomeButton.disabled = false;
+
+  // Update fix button to show locked state
+  elements.fixBpmButton.textContent = 'UNLOCK';
+  elements.fixBpmButton.classList.add('locked');
+  elements.fixBpmButton.disabled = false;
+
+  // Show visual feedback
+  elements.bpmValue.textContent = bpm;
+}
+
+/**
+ * Update SET BPM button state based on metronome state
+ */
+function updateSetBpmButtonState() {
+  // Disable SET BPM button when metronome is playing
+  if (state.metronomeActive) {
+    elements.setBpmButton.disabled = true;
+  } else {
+    elements.setBpmButton.disabled = false;
   }
 }
 
@@ -408,6 +531,69 @@ elements.fixBpmButton.addEventListener('keydown', (e) => {
 });
 
 elements.playMetronomeButton.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' || e.key === ' ') {
+    e.stopPropagation();
+  }
+});
+
+/**
+ * Handle SET BPM button click
+ */
+elements.setBpmButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  openBpmModal();
+});
+
+/**
+ * Handle modal confirm button
+ */
+elements.confirmBpmButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  applyManualBPM();
+});
+
+/**
+ * Handle modal cancel button
+ */
+elements.cancelBpmButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  closeBpmModal();
+});
+
+/**
+ * Handle Enter key in BPM input
+ */
+elements.bpmInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    applyManualBPM();
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    closeBpmModal();
+  }
+});
+
+/**
+ * Clear error message when user starts typing
+ */
+elements.bpmInput.addEventListener('input', () => {
+  elements.bpmError.textContent = '';
+});
+
+/**
+ * Close modal when clicking on overlay background
+ */
+elements.bpmModal.addEventListener('click', (e) => {
+  // Only close if clicking the overlay itself, not the modal content
+  if (e.target === elements.bpmModal) {
+    closeBpmModal();
+  }
+});
+
+/**
+ * Prevent spacebar from triggering tap when SET BPM button has focus
+ */
+elements.setBpmButton.addEventListener('keydown', (e) => {
   if (e.code === 'Space' || e.key === ' ') {
     e.stopPropagation();
   }
