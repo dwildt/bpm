@@ -95,6 +95,201 @@ Claude Code ensured:
 - **Responsiveness**: Mobile-first approach with responsive design
 - **Performance**: No dependencies, pure vanilla JavaScript
 
+## Git Commit Conventions
+
+This project follows strict commit message conventions to maintain a clean history and automate issue management.
+
+### Commit Message Format
+
+We use [Conventional Commits](https://www.conventionalcommits.org/) format:
+
+```
+<type>: <subject>
+
+<body>
+
+<footer>
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, no logic change)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks, dependencies, tooling
+
+**Subject:**
+- Use imperative mood ("add" not "added" or "adds")
+- Don't capitalize first letter
+- No period at the end
+- Maximum 50 characters
+
+**Body:**
+- Explain what and why (not how)
+- Wrap at 72 characters
+- Can include bullet points
+
+### Issue Referencing
+
+**CRITICAL: Always reference related GitHub issues in commit messages.**
+
+**Reference Format:**
+```
+feat: add manual BPM input with modal dialog
+
+Implement modal dialog for direct BPM entry.
+
+Related to #2
+```
+
+**Auto-closing Keywords:**
+
+When a commit completes work on an issue, use closing keywords in the commit footer:
+
+```
+feat: implement feature X
+
+Description of changes...
+
+Fixes #123
+Closes #456
+Resolves #789
+```
+
+**Available Keywords:**
+- `Fixes #issue` - Closes the issue
+- `Closes #issue` - Closes the issue
+- `Resolves #issue` - Closes the issue
+
+**Multiple Issues:**
+```
+Fixes #123, #456
+Closes #789
+```
+
+**Important Notes:**
+- Keywords are case-insensitive (`Fixes`, `fixes`, `FIXES` all work)
+- Must be in commit message body or footer (not just subject)
+- Issues close automatically when commit is pushed to default branch (main)
+
+### Co-authorship
+
+All commits assisted by Claude Code should include:
+
+```
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+### Complete Examples
+
+**Example 1: Feature with Issue Reference**
+```
+feat: add manual BPM input with modal dialog
+
+Add a "SET BPM" button that allows users to directly enter a BPM value
+instead of tapping to calculate it. This provides a faster workflow for
+users who already know their desired tempo.
+
+Features:
+- Modal dialog with BPM input field (30-300 range)
+- Real-time validation with helpful error messages
+- Keyboard shortcuts (Enter to confirm, Escape to cancel)
+- Automatically fixes BPM and enables metronome
+- Button disabled during metronome playback
+- Maintains 8-bit aesthetic across all themes
+
+Closes #2
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+**Example 2: Bug Fix**
+```
+fix: resolve metronome timing drift after 5 minutes
+
+The metronome was experiencing timing drift due to setInterval
+accumulation. Switched to a more precise scheduling mechanism
+using AudioContext.currentTime.
+
+Fixes #15
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+**Example 3: Documentation**
+```
+docs: update README with keyboard shortcuts
+
+Add comprehensive keyboard shortcuts section to README.md
+to improve discoverability of features.
+
+Related to #20
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+**Example 4: Multiple Issues**
+```
+refactor: simplify metronome state management
+
+Consolidate metronome state into single object and remove
+redundant boolean flags. This improves code maintainability
+and reduces potential for state inconsistencies.
+
+Fixes #25, #27
+Resolves #30
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+### Bad Examples (Avoid These)
+
+❌ **No issue reference:**
+```
+feat: add new button
+```
+
+❌ **Vague subject:**
+```
+fix: fix bug
+```
+
+❌ **Wrong keyword:**
+```
+feat: add feature
+
+Issue #123 is done now
+```
+
+❌ **Missing Co-authored-by:**
+```
+feat: add feature
+
+Closes #123
+```
+
+❌ **Capital letter in subject:**
+```
+feat: Add new feature
+```
+
+### Workflow Summary
+
+1. **Create GitHub issue** for the task
+2. **Work on the feature/fix** in your branch
+3. **Write commit message** following conventions
+4. **Reference issue** with `Fixes #N` when complete
+5. **Push to main** - issue closes automatically
+6. **Always include** Claude co-authorship
+
+This ensures:
+- ✅ Clean commit history
+- ✅ Automatic issue tracking
+- ✅ Clear attribution
+- ✅ Easy navigation between code and discussions
+
 ## Technology Choices
 
 ### Why Vanilla JavaScript?
