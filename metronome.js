@@ -29,13 +29,6 @@ const TIME_SIGNATURES = {
     secondaryAccent: [],     // No secondary accents
     label: '2/4 (March)',
     description: 'March time, bouncy feel'
-  },
-  '6/8': {
-    beatsPerMeasure: 2,
-    primaryAccent: [0],      // Beat 1 gets primary accent
-    secondaryAccent: [1],    // Beat 2 gets secondary accent
-    label: '6/8 (Compound)',
-    description: 'Compound duple, rolling feel'
   }
 };
 
@@ -140,7 +133,7 @@ function getFrequencyForBeat(beatIndex, timeSignature = '4/4') {
     return 1000;
   }
 
-  // Secondary accent (e.g., beat 2 in 6/8): 900 Hz
+  // Secondary accent: 900 Hz
   if (config.secondaryAccent.includes(beatIndex)) {
     return 900;
   }

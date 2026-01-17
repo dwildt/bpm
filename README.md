@@ -12,7 +12,7 @@ Find the current BPM (Beats Per Minute) of any song by tapping along to the beat
 - **Real-time BPM Calculation**: Automatic calculation based on tap intervals
 - **Manual BPM Input**: Directly enter a BPM value for instant metronome use
 - **Metronome**: Lock a BPM and play audible clicks with multiple time signatures
-- **Multiple Time Signatures**: Support for 4/4, 3/4, 2/4, and 6/8 time signatures
+- **Multiple Time Signatures**: Support for 4/4, 3/4, and 2/4 time signatures
 - **8-bit Audio**: Retro square wave beeps generated with Web Audio API
 - **Visual Beat Indicator**: Dynamic display showing the current beat position
 - **8-bit Aesthetic**: Retro game-inspired UI with neon colors and pixel fonts
@@ -188,28 +188,24 @@ The metronome uses Web Audio API for precise audio timing:
    - **4/4 (Common Time)**: 4 beats per measure, accent on beat 1
    - **3/4 (Waltz)**: 3 beats per measure, accent on beat 1
    - **2/4 (March)**: 2 beats per measure, accent on beat 1
-   - **6/8 (Compound)**: 2 main beats, accents on beats 1 and 2
 4. **Accent Patterns**:
    - Primary accent (beat 1): 1000 Hz frequency, 0.3 volume
-   - Secondary accent (beat 2 in 6/8): 900 Hz frequency, 0.2 volume
    - Regular beats: 800 Hz frequency, 0.15 volume
 5. **Visual Feedback**: Beat indicator dynamically adjusts to show correct number of beats
 6. **BPM Range**: Validates BPM between 30-300 for practical metronome use
 
 ### Time Signatures
 
-The calculator supports four essential time signatures:
+The calculator supports three essential time signatures:
 
 | Time Signature | Beats | Description | Use Cases |
 |----------------|-------|-------------|-----------|
 | **4/4** | 4 | Common Time | Most popular music, rock, pop, marches |
 | **3/4** | 3 | Waltz Time | Waltzes, folk music, ballads, country |
 | **2/4** | 2 | March Time | Polkas, marches, simple dance music |
-| **6/8** | 2 | Compound Duple | Irish jigs, rock ballads, folk, flowing feel |
 
 **Accent Patterns:**
-- **4/4, 3/4, 2/4**: Accent on beat 1 (downbeat) only
-- **6/8**: Primary accent on beat 1, secondary accent on beat 2
+- All time signatures: Accent on beat 1 (downbeat) only
 
 The time signature selector allows you to choose the appropriate meter for your practice session. The visual beat indicator and audio accents automatically adjust to match the selected time signature.
 
