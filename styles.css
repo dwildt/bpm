@@ -223,58 +223,6 @@ body {
     opacity: 0.8;
 }
 
-/* Info Section */
-.info-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 400px;
-    gap: var(--spacing-md);
-}
-
-.tap-count {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm);
-    border: 2px solid var(--color-secondary);
-    background-color: rgba(0, 0, 0, 0.5);
-    flex: 1;
-}
-
-.info-label {
-    font-size: clamp(0.6rem, 2vw, 0.8rem);
-    color: var(--color-secondary);
-}
-
-.info-value {
-    font-size: clamp(0.8rem, 3vw, 1.2rem);
-    color: var(--color-primary);
-}
-
-/* Reset Button */
-.reset-button {
-    font-family: var(--font-main);
-    font-size: clamp(0.6rem, 2vw, 0.8rem);
-    padding: var(--spacing-sm) var(--spacing-md);
-    background-color: transparent;
-    color: var(--color-secondary);
-    border: 2px solid var(--color-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.reset-button:hover {
-    background-color: var(--color-secondary);
-    color: var(--color-bg);
-    box-shadow: 0 0 10px var(--color-secondary);
-}
-
-.reset-button:active {
-    transform: scale(0.95);
-}
-
 /* Metronome Section */
 .metronome-section {
     display: flex;
@@ -825,20 +773,6 @@ body {
 @media (max-width: 600px) {
     .container {
         padding: var(--spacing-sm);
-    }
-
-    .info-section {
-        flex-direction: column;
-        gap: var(--spacing-sm);
-    }
-
-    .tap-count,
-    .reset-button {
-        width: 100%;
-    }
-
-    .tap-count {
-        justify-content: center;
     }
 
     .metronome-section {

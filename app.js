@@ -22,9 +22,7 @@ const state = {
 // DOM Elements
 const elements = {
   tapButton: document.getElementById('tapButton'),
-  resetButton: document.getElementById('resetButton'),
   bpmValue: document.getElementById('bpmValue'),
-  tapCount: document.getElementById('tapCount'),
   // Metronome elements
   fixBpmButton: document.getElementById('fixBpmButton'),
   playMetronomeButton: document.getElementById('playMetronomeButton'),
@@ -70,9 +68,6 @@ function updateDisplay() {
     elements.bpmValue.textContent = '---';
     elements.fixBpmButton.disabled = true;
   }
-
-  // Update tap count
-  elements.tapCount.textContent = state.taps.length;
 
   // Update metronome display
   updateMetronomeDisplay();
@@ -543,25 +538,11 @@ document.addEventListener('keydown', (e) => {
 });
 
 /**
- * Handle reset button click
- */
-elements.resetButton.addEventListener('click', (e) => {
-  e.preventDefault();
-  reset();
-});
-
-/**
  * Prevent spacebar from triggering buttons when they have focus
  */
 elements.tapButton.addEventListener('keydown', (e) => {
   if (e.code === 'Space' || e.key === ' ') {
     e.preventDefault();
-  }
-});
-
-elements.resetButton.addEventListener('keydown', (e) => {
-  if (e.code === 'Space' || e.key === ' ') {
-    e.stopPropagation();
   }
 });
 
