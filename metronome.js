@@ -33,6 +33,33 @@ const TIME_SIGNATURES = {
 };
 
 /**
+ * Subdivision Configuration
+ * Defines available note subdivisions with their characteristics
+ */
+const SUBDIVISIONS = {
+  '1/4': {
+    count: 1,
+    label: '♩ Quarter Notes',
+    description: 'Main beats only (1 click per beat)'
+  },
+  '1/8': {
+    count: 2,
+    label: '♪ Eighth Notes',
+    description: 'Two clicks per beat'
+  },
+  '1/16': {
+    count: 4,
+    label: '♬ Sixteenth Notes',
+    description: 'Four clicks per beat'
+  },
+  '1/3': {
+    count: 3,
+    label: '♪♪♪ Triplets',
+    description: 'Three clicks per beat (triplet feel)'
+  }
+};
+
+/**
  * Get time signature configuration
  * @param {string} timeSignature - Time signature (e.g., "4/4", "3/4")
  * @returns {object} Time signature configuration
@@ -51,6 +78,85 @@ function getTimeSignatureConfig(timeSignature) {
  */
 function getAvailableTimeSignatures() {
   return Object.keys(TIME_SIGNATURES);
+}
+
+/**
+ * Get subdivision configuration
+ * @param {string} subdivision - Subdivision (e.g., "1/4", "1/8", "1/16", "1/3")
+ * @returns {object} Subdivision configuration
+ */
+function getSubdivisionConfig(subdivision) {
+  const config = SUBDIVISIONS[subdivision];
+  if (!config) {
+    throw new Error(`Unknown subdivision: ${subdivision}`);
+  }
+  return config;
+}
+
+/**
+ * Get list of available subdivisions
+ * @returns {Array<string>} Array of subdivision keys
+ */
+function getAvailableSubdivisions() {
+  return Object.keys(SUBDIVISIONS);
+}
+
+/**
+ * Calculate interval for subdivision based on BPM
+ * @param {number} bpm - Beats per minute
+ * @param {string} subdivision - Subdivision (e.g., "1/4", "1/8")
+ * @returns {number} Interval in milliseconds between subdivision clicks
+ */
+function calculateSubdivisionInterval(bpm, subdivision) {
+  const beatInterval = calculateInterval(bpm);
+  const config = getSubdivisionConfig(subdivision);
+  return beatInterval / config.count;
+}
+
+/**
+ * Check if subdivision is valid for given BPM
+ * @param {string} subdivision - Subdivision to validate
+ * @param {number} bpm - Current BPM
+ * @returns {boolean} True if subdivision is valid for this BPM
+ */
+function isSubdivisionValidForBPM(subdivision, bpm) {
+  // Sixteenth notes above 180 BPM = intervals < 83ms
+  // Too fast and imprecise with setInterval
+  if (subdivision === '1/16' && bpm > 180) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Get frequency and volume for subdivision based on position
+ * @param {number} beatIndex - Beat position (0-based)
+ * @param {number} subdivisionIndex - Subdivision position within beat (0-based)
+ * @param {string} timeSignature - Time signature (e.g., "4/4")
+ * @param {string} subdivision - Subdivision type (e.g., "1/16")
+ * @returns {object} Object with frequency (Hz) and volume properties
+ */
+function getSubdivisionFrequency(beatIndex, subdivisionIndex, timeSignature = '4/4', subdivision = '1/4') {
+  const config = getTimeSignatureConfig(timeSignature);
+  const subdivisionConfig = getSubdivisionConfig(subdivision);
+
+  // First subdivision of downbeat (beat 1)
+  if (beatIndex === 0 && subdivisionIndex === 0) {
+    return { frequency: 1000, volume: 0.3 };
+  }
+
+  // First subdivision of any beat
+  if (subdivisionIndex === 0) {
+    return { frequency: 900, volume: 0.2 };
+  }
+
+  // Subdivision on main beat emphasis (e.g., 3rd sixteenth in groups of 4)
+  if (subdivisionConfig.count === 4 && subdivisionIndex === 2) {
+    return { frequency: 850, volume: 0.15 };
+  }
+
+  // Regular subdivisions
+  return { frequency: 800, volume: 0.12 };
 }
 
 /**
@@ -174,7 +280,14 @@ if (typeof window !== 'undefined') {
     isValidMetronomeBPM,
     getTimeSignatureConfig,
     getAvailableTimeSignatures,
-    TIME_SIGNATURES
+    TIME_SIGNATURES,
+    // Subdivision functions
+    getSubdivisionConfig,
+    getAvailableSubdivisions,
+    calculateSubdivisionInterval,
+    isSubdivisionValidForBPM,
+    getSubdivisionFrequency,
+    SUBDIVISIONS
   };
 }
 
@@ -189,6 +302,13 @@ if (typeof module !== 'undefined' && module.exports) {
     isValidMetronomeBPM,
     getTimeSignatureConfig,
     getAvailableTimeSignatures,
-    TIME_SIGNATURES
+    TIME_SIGNATURES,
+    // Subdivision functions
+    getSubdivisionConfig,
+    getAvailableSubdivisions,
+    calculateSubdivisionInterval,
+    isSubdivisionValidForBPM,
+    getSubdivisionFrequency,
+    SUBDIVISIONS
   };
 }

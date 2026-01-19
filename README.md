@@ -13,6 +13,7 @@ Find the current BPM (Beats Per Minute) of any song by tapping along to the beat
 - **Manual BPM Input**: Directly enter a BPM value for instant metronome use
 - **Metronome**: Lock a BPM and play audible clicks with multiple time signatures
 - **Multiple Time Signatures**: Support for 4/4, 3/4, and 2/4 time signatures
+- **Subdivisions**: Practice with quarter notes, eighth notes, sixteenth notes, or triplets
 - **8-bit Audio**: Retro square wave beeps generated with Web Audio API
 - **Visual Beat Indicator**: Dynamic display showing the current beat position
 - **8-bit Aesthetic**: Retro game-inspired UI with neon colors and pixel fonts
@@ -40,16 +41,22 @@ Visit the live demo: [https://dwildt.github.io/bpm/](https://dwildt.github.io/bp
 1. Tap to calculate a BPM (at least 2 taps required)
 2. Click **FIX BPM** to lock the current BPM value
 3. Select your desired **TIME SIGNATURE** from the dropdown
-4. Click **PLAY** to start the metronome
-5. The metronome will play with accent patterns:
-   - Primary accent (downbeat): 1000 Hz, louder
-   - Secondary accent (compound meters): 900 Hz, medium
-   - Regular beats: 800 Hz, quieter
-6. Visual beat indicator shows the current beat position
-7. Click **STOP** to stop playback
-8. Click **UNLOCK** to unlock the BPM and measure a new tempo
+4. Select your desired **SUBDIVISION** from the dropdown:
+   - **Quarter Notes (♩)**: Main beats only (1 click per beat)
+   - **Eighth Notes (♪)**: Two clicks per beat
+   - **Sixteenth Notes (♬)**: Four clicks per beat (disabled above 180 BPM)
+   - **Triplets (♪♪♪)**: Three clicks per beat (triplet feel)
+5. Click **PLAY** to start the metronome
+6. The metronome will play with accent patterns:
+   - Downbeat (beat 1, first subdivision): 1000 Hz, loudest
+   - Beat start (first subdivision of each beat): 900 Hz, loud
+   - Mid-beat emphasis (e.g., 3rd sixteenth): 850 Hz, medium
+   - Regular subdivisions: 800 Hz, quieter
+7. Visual beat indicator shows the current beat position
+8. Click **STOP** to stop playback
+9. Click **UNLOCK** to unlock the BPM and measure a new tempo
 
-**Note**: Time signature can only be changed when the metronome is stopped.
+**Note**: Time signature and subdivision can only be changed when the metronome is stopped.
 
 ### Setting BPM Manually
 
@@ -208,6 +215,44 @@ The calculator supports three essential time signatures:
 - All time signatures: Accent on beat 1 (downbeat) only
 
 The time signature selector allows you to choose the appropriate meter for your practice session. The visual beat indicator and audio accents automatically adjust to match the selected time signature.
+
+### Subdivisions
+
+The metronome supports four subdivision types to help you practice different rhythmic feels:
+
+| Subdivision | Clicks per Beat | Description | Use Cases |
+|-------------|-----------------|-------------|-----------|
+| **Quarter Notes (♩)** | 1 | Main beats only | Standard practice, basic tempo keeping |
+| **Eighth Notes (♪)** | 2 | Two clicks per beat | Faster practice, improving timing precision |
+| **Sixteenth Notes (♬)** | 4 | Four clicks per beat | Advanced practice, very precise timing |
+| **Triplets (♪♪♪)** | 3 | Three clicks per beat | Triplet feel, shuffle rhythms |
+
+**Subdivision Intervals by BPM:**
+
+At 120 BPM (beat interval = 500ms):
+- Quarter notes: 1 click every 500ms
+- Eighth notes: 1 click every 250ms
+- Sixteenth notes: 1 click every 125ms
+- Triplets: 1 click every 166.67ms
+
+At 180 BPM (beat interval = 333ms):
+- Quarter notes: 1 click every 333ms
+- Eighth notes: 1 click every 166.5ms
+- Triplets: 1 click every 111ms
+
+**BPM Limitations:**
+- Sixteenth notes are automatically disabled when BPM exceeds 180
+- This is because intervals become too fast (<83ms) for precise timing with setInterval
+
+**Accent Hierarchy:**
+
+The metronome uses a 4-level frequency/volume system to distinguish different subdivision positions:
+1. **Downbeat (1000 Hz, 0.3 volume)**: First subdivision of beat 1
+2. **Beat start (900 Hz, 0.2 volume)**: First subdivision of any beat
+3. **Mid-beat emphasis (850 Hz, 0.15 volume)**: 3rd of 4 sixteenths (weak beat emphasis)
+4. **Regular subdivisions (800 Hz, 0.12 volume)**: All other subdivisions
+
+This accent pattern helps you internalize the rhythmic structure while practicing.
 
 ## Technologies Used
 

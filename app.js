@@ -17,6 +17,10 @@ const state = {
   // Time signature state
   timeSignature: '4/4',        // Current time signature
   beatsPerMeasure: 4,          // Number of beats in current time signature
+  // Subdivision state
+  subdivision: '1/4',          // Current subdivision (quarter, eighth, sixteenth, triplet)
+  subdivisionCount: 1,         // Number of subdivisions per beat
+  currentSubdivision: 0,       // Current subdivision index (0-based)
 };
 
 // DOM Elements
@@ -37,6 +41,8 @@ const elements = {
   bpmError: document.getElementById('bpmError'),
   // Time signature elements
   timeSignatureSelector: document.getElementById('timeSignatureSelector'),
+  // Subdivision elements
+  subdivisionSelector: document.getElementById('subdivisionSelector'),
 };
 
 // ============================================
@@ -170,6 +176,9 @@ function fixBPM() {
     state.fixedBPM = bpm;
     updateMetronomeDisplay();
 
+    // Update subdivision options based on BPM
+    updateSubdivisionOptions();
+
     // Enable play button
     elements.playMetronomeButton.disabled = false;
 
@@ -237,9 +246,16 @@ function playMetronomeBeat() {
     return;
   }
 
-  // Get frequency based on current beat and time signature
-  const frequency = MetronomeLogic.getFrequencyForBeat(state.currentBeat, state.timeSignature);
-  const isAccent = MetronomeLogic.isAccentedBeat(state.currentBeat, state.timeSignature);
+  // Get frequency and volume based on current beat, subdivision, and time signature
+  const { frequency, volume } = MetronomeLogic.getSubdivisionFrequency(
+    state.currentBeat,
+    state.currentSubdivision,
+    state.timeSignature,
+    state.subdivision
+  );
+
+  // Accent is only on first subdivision of downbeat
+  const isAccent = (state.currentBeat === 0 && state.currentSubdivision === 0);
 
   try {
     MetronomeLogic.playBeep(state.audioContext, frequency, 0.05, isAccent);
@@ -247,11 +263,18 @@ function playMetronomeBeat() {
     console.error('Error playing beep:', error);
   }
 
-  // Update visual indicator
-  updateBeatIndicator();
+  // Update visual indicator (only when starting a new beat)
+  if (state.currentSubdivision === 0) {
+    updateBeatIndicator();
+  }
 
-  // Advance to next beat (wrap around based on beats per measure)
-  state.currentBeat = (state.currentBeat + 1) % state.beatsPerMeasure;
+  // Advance subdivision
+  state.currentSubdivision = (state.currentSubdivision + 1) % state.subdivisionCount;
+
+  // Advance to next beat when subdivisions complete
+  if (state.currentSubdivision === 0) {
+    state.currentBeat = (state.currentBeat + 1) % state.beatsPerMeasure;
+  }
 }
 
 /**
@@ -282,6 +305,7 @@ function startMetronome() {
 
     state.metronomeActive = true;
     state.currentBeat = 0;
+    state.currentSubdivision = 0;
 
     // Update button UI
     elements.playMetronomeButton.innerHTML =
@@ -295,11 +319,17 @@ function startMetronome() {
     // Disable SET BPM button while playing
     updateSetBpmButtonState();
 
+    // Disable time signature selector while playing
+    elements.timeSignatureSelector.disabled = true;
+
+    // Disable subdivision selector while playing
+    elements.subdivisionSelector.disabled = true;
+
     // Play first beat immediately
     playMetronomeBeat();
 
-    // Set up interval for subsequent beats
-    const interval = MetronomeLogic.calculateInterval(state.fixedBPM);
+    // Set up interval for subsequent beats using subdivision interval
+    const interval = MetronomeLogic.calculateSubdivisionInterval(state.fixedBPM, state.subdivision);
     state.metronomeTimer = setInterval(() => {
       playMetronomeBeat();
     }, interval);
@@ -340,6 +370,12 @@ function stopMetronome() {
 
   // Re-enable SET BPM button
   updateSetBpmButtonState();
+
+  // Re-enable time signature selector
+  elements.timeSignatureSelector.disabled = false;
+
+  // Re-enable subdivision selector
+  elements.subdivisionSelector.disabled = false;
 }
 
 /**
@@ -436,6 +472,9 @@ function setManualBPM(bpm) {
   updateDisplay();
   updateMetronomeDisplay();
 
+  // Update subdivision options based on BPM
+  updateSubdivisionOptions();
+
   // Enable play button
   elements.playMetronomeButton.disabled = false;
 
@@ -512,6 +551,72 @@ function updateBeatIndicatorDots() {
 
   // Update active dot
   updateBeatIndicator();
+}
+
+// ============================================
+// SUBDIVISION FUNCTIONS
+// ============================================
+
+/**
+ * Change subdivision
+ * @param {string} newSubdivision - Subdivision (e.g., "1/4", "1/8", "1/16", "1/3")
+ */
+function changeSubdivision(newSubdivision) {
+  // Can't change subdivision while metronome is playing
+  if (state.metronomeActive) {
+    console.warn('Cannot change subdivision while metronome is playing');
+    return;
+  }
+
+  try {
+    // Validate subdivision exists
+    const config = MetronomeLogic.getSubdivisionConfig(newSubdivision);
+
+    // Check if subdivision is valid for current BPM
+    if (state.fixedBPM !== null && !MetronomeLogic.isSubdivisionValidForBPM(newSubdivision, state.fixedBPM)) {
+      console.warn(`Subdivision ${newSubdivision} is not valid for BPM ${state.fixedBPM}`);
+      // Revert selector to current subdivision
+      elements.subdivisionSelector.value = state.subdivision;
+      return;
+    }
+
+    // Update state
+    state.subdivision = newSubdivision;
+    state.subdivisionCount = config.count;
+    state.currentSubdivision = 0;
+
+    console.log(`Changed subdivision to ${newSubdivision} (${config.label})`);
+  } catch (error) {
+    console.error('Error changing subdivision:', error);
+  }
+}
+
+/**
+ * Update subdivision selector options based on current BPM
+ * Disables sixteenth notes if BPM > 180
+ */
+function updateSubdivisionOptions() {
+  if (!elements.subdivisionSelector) return;
+
+  const options = elements.subdivisionSelector.options;
+
+  // Enable/disable sixteenth notes based on BPM
+  for (let i = 0; i < options.length; i++) {
+    const option = options[i];
+    const subdivision = option.value;
+
+    if (state.fixedBPM !== null && !MetronomeLogic.isSubdivisionValidForBPM(subdivision, state.fixedBPM)) {
+      option.disabled = true;
+      // If current selection is being disabled, revert to quarter notes
+      if (state.subdivision === subdivision) {
+        state.subdivision = '1/4';
+        state.subdivisionCount = 1;
+        elements.subdivisionSelector.value = '1/4';
+      }
+    } else {
+      option.disabled = false;
+    }
+  }
 }
 
 // ============================================
@@ -646,6 +751,14 @@ elements.setBpmButton.addEventListener('keydown', (e) => {
 elements.timeSignatureSelector.addEventListener('change', (e) => {
   e.preventDefault();
   changeTimeSignature(e.target.value);
+});
+
+/**
+ * Handle subdivision selection change
+ */
+elements.subdivisionSelector.addEventListener('change', (e) => {
+  e.preventDefault();
+  changeSubdivision(e.target.value);
 });
 
 /**
