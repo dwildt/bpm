@@ -2,6 +2,8 @@
 // 8-BIT BPM CALCULATOR
 // ============================================
 
+import { FACTORY_PRESETS } from './presets.js';
+
 // State
 const state = {
   taps: [],                    // Array of tap timestamps
@@ -21,6 +23,8 @@ const state = {
   subdivision: '1/4',          // Current subdivision (quarter, eighth, sixteenth, triplet)
   subdivisionCount: 1,         // Number of subdivisions per beat
   currentSubdivision: 0,       // Current subdivision index (0-based)
+  // Preset state
+  currentPresetId: null,       // Currently loaded preset ID
 };
 
 // DOM Elements
@@ -43,6 +47,15 @@ const elements = {
   timeSignatureSelector: document.getElementById('timeSignatureSelector'),
   // Subdivision elements
   subdivisionSelector: document.getElementById('subdivisionSelector'),
+  // Preset elements
+  savePresetButton: document.getElementById('savePresetButton'),
+  managePresetsButton: document.getElementById('managePresetsButton'),
+  presetsModal: document.getElementById('presetsModal'),
+  presetNameInput: document.getElementById('presetNameInput'),
+  saveNewPresetButton: document.getElementById('saveNewPresetButton'),
+  closePresetsButton: document.getElementById('closePresetsButton'),
+  presetsList: document.getElementById('presetsList'),
+  presetError: document.getElementById('presetError'),
 };
 
 // ============================================
@@ -182,6 +195,9 @@ function fixBPM() {
     // Enable play button
     elements.playMetronomeButton.disabled = false;
 
+    // Enable save preset button
+    elements.savePresetButton.disabled = false;
+
     // Update fix button text to show it's locked
     elements.fixBpmButton.textContent = 'UNLOCK';
     elements.fixBpmButton.classList.add('locked');
@@ -218,6 +234,10 @@ function unlockBPM() {
 
   // Disable play button
   elements.playMetronomeButton.disabled = true;
+
+  // Disable save preset button
+  elements.savePresetButton.disabled = true;
+  state.currentPresetId = null;
 
   // Update fix button text
   elements.fixBpmButton.textContent = 'FIX BPM';
@@ -478,6 +498,9 @@ function setManualBPM(bpm) {
   // Enable play button
   elements.playMetronomeButton.disabled = false;
 
+  // Enable save preset button
+  elements.savePresetButton.disabled = false;
+
   // Update fix button to show locked state
   elements.fixBpmButton.textContent = 'UNLOCK';
   elements.fixBpmButton.classList.add('locked');
@@ -620,6 +643,266 @@ function updateSubdivisionOptions() {
 }
 
 // ============================================
+// PRESET FUNCTIONS
+// ============================================
+
+/**
+ * Open presets modal
+ */
+function openPresetsModal() {
+  elements.presetsModal.hidden = false;
+  renderPresetsList();
+  elements.presetNameInput.focus();
+}
+
+/**
+ * Close presets modal
+ */
+function closePresetsModal() {
+  elements.presetsModal.hidden = true;
+  elements.presetNameInput.value = '';
+  elements.presetError.textContent = '';
+}
+
+/**
+ * Save new preset with current settings
+ */
+function saveNewPreset() {
+  const name = elements.presetNameInput.value.trim();
+
+  // Validation
+  if (!name) {
+    elements.presetError.textContent = 'Please enter a preset name';
+    elements.presetNameInput.focus();
+    return;
+  }
+
+  if (name.length > 30) {
+    elements.presetError.textContent = 'Name must be 30 characters or less';
+    elements.presetNameInput.focus();
+    return;
+  }
+
+  if (!state.fixedBPM) {
+    elements.presetError.textContent = 'Please fix a BPM first';
+    return;
+  }
+
+  try {
+    const preset = PresetManager.addPreset(
+      name,
+      state.fixedBPM,
+      state.timeSignature,
+      state.subdivision
+    );
+
+    state.currentPresetId = preset.id;
+    elements.presetNameInput.value = '';
+    elements.presetError.textContent = '';
+    renderPresetsList();
+
+    console.log(`Saved preset: ${name}`);
+  } catch (error) {
+    elements.presetError.textContent = error.message;
+  }
+}
+
+/**
+ * Load a preset by ID
+ */
+function loadPreset(presetId) {
+  const preset = PresetManager.getPreset(presetId);
+  if (!preset) {
+    console.error('Preset not found:', presetId);
+    return;
+  }
+
+  // Stop metronome if playing
+  if (state.metronomeActive) {
+    stopMetronome();
+  }
+
+  // Clear taps and timers
+  state.taps = [];
+  if (state.resetTimer) {
+    clearTimeout(state.resetTimer);
+    state.resetTimer = null;
+  }
+
+  // Load BPM
+  state.fixedBPM = preset.bpm;
+
+  // Load time signature
+  state.timeSignature = preset.timeSignature;
+  const tsConfig = MetronomeLogic.getTimeSignatureConfig(preset.timeSignature);
+  state.beatsPerMeasure = tsConfig.beatsPerMeasure;
+  state.currentBeat = 0;
+  elements.timeSignatureSelector.value = preset.timeSignature;
+  updateBeatIndicatorDots();
+
+  // Load subdivision
+  state.subdivision = preset.subdivision;
+  const subdivConfig = MetronomeLogic.getSubdivisionConfig(preset.subdivision);
+  state.subdivisionCount = subdivConfig.count;
+  state.currentSubdivision = 0;
+  elements.subdivisionSelector.value = preset.subdivision;
+
+  // Update displays
+  updateDisplay();
+  updateMetronomeDisplay();
+  updateSubdivisionOptions();
+
+  // Enable play button
+  elements.playMetronomeButton.disabled = false;
+
+  // Update fix button to locked state
+  elements.fixBpmButton.textContent = 'UNLOCK';
+  elements.fixBpmButton.classList.add('locked');
+  elements.fixBpmButton.disabled = false;
+
+  // Enable save preset button
+  elements.savePresetButton.disabled = false;
+
+  // Visual feedback
+  elements.bpmValue.textContent = preset.bpm;
+
+  // Track current preset
+  state.currentPresetId = presetId;
+
+  // Close modal
+  closePresetsModal();
+
+  console.log(`Loaded preset: ${preset.name}`);
+}
+
+/**
+ * Delete a preset by ID
+ */
+function deletePreset(presetId) {
+  if (!confirm('Delete this preset?')) {
+    return;
+  }
+
+  PresetManager.deletePreset(presetId);
+
+  if (state.currentPresetId === presetId) {
+    state.currentPresetId = null;
+  }
+
+  renderPresetsList();
+}
+
+/**
+ * Render the presets list in the modal
+ */
+function renderPresetsList() {
+  const presets = PresetManager.getAllPresets();
+  const container = elements.presetsList;
+
+  container.innerHTML = '';
+
+  if (presets.length === 0) {
+    container.innerHTML = `
+      <div class="presets-empty">
+        <p>No presets saved yet.</p>
+        <p>Save your first preset above!</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Separate factory and user presets
+  const factoryPresets = presets.filter(p => p.isFactory);
+  const userPresets = presets.filter(p => !p.isFactory);
+
+  // Render factory presets section
+  if (factoryPresets.length > 0) {
+    const factorySection = document.createElement('div');
+    factorySection.className = 'preset-section';
+    factorySection.innerHTML = '<h4 class="preset-section-title">🎵 FACTORY PRESETS</h4>';
+
+    factoryPresets.forEach(preset => {
+      const item = createPresetItem(preset, false); // false = no delete button
+      factorySection.appendChild(item);
+    });
+
+    container.appendChild(factorySection);
+  }
+
+  // Render user presets section
+  if (userPresets.length > 0) {
+    const userSection = document.createElement('div');
+    userSection.className = 'preset-section';
+    userSection.innerHTML = '<h4 class="preset-section-title">💾 MY PRESETS</h4>';
+
+    // Sort by date (newest first)
+    userPresets.sort((a, b) => b.createdAt - a.createdAt);
+
+    userPresets.forEach(preset => {
+      const item = createPresetItem(preset, true); // true = show delete button
+      userSection.appendChild(item);
+    });
+
+    container.appendChild(userSection);
+  }
+}
+
+/**
+ * Create a preset list item element
+ */
+function createPresetItem(preset, showDelete) {
+  const item = document.createElement('div');
+  item.className = 'preset-item';
+  if (preset.id === state.currentPresetId) {
+    item.classList.add('active');
+  }
+
+  const subdivConfig = MetronomeLogic.SUBDIVISIONS[preset.subdivision];
+  const subdivLabel = subdivConfig ? subdivConfig.label : preset.subdivision;
+
+  const deleteButton = showDelete
+    ? `<button class="preset-delete-btn" data-preset-id="${preset.id}">DELETE</button>`
+    : '';
+
+  item.innerHTML = `
+    <div class="preset-info">
+      <div class="preset-name">${preset.name}</div>
+      <div class="preset-details">
+        ${preset.bpm} BPM · ${preset.timeSignature} · ${subdivLabel}
+      </div>
+    </div>
+    <div class="preset-actions">
+      <button class="preset-load-btn" data-preset-id="${preset.id}">LOAD</button>
+      ${deleteButton}
+    </div>
+  `;
+
+  // Event listeners
+  const loadBtn = item.querySelector('.preset-load-btn');
+  loadBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    loadPreset(preset.id);
+  });
+
+  if (showDelete) {
+    const deleteBtn = item.querySelector('.preset-delete-btn');
+    deleteBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      deletePreset(preset.id);
+    });
+  }
+
+  return item;
+}
+
+/**
+ * Clear current preset ID (when user manually changes settings)
+ */
+function clearCurrentPreset() {
+  state.currentPresetId = null;
+}
+
+// ============================================
 // EVENT LISTENERS
 // ============================================
 
@@ -751,6 +1034,7 @@ elements.setBpmButton.addEventListener('keydown', (e) => {
 elements.timeSignatureSelector.addEventListener('change', (e) => {
   e.preventDefault();
   changeTimeSignature(e.target.value);
+  clearCurrentPreset(); // Clear preset when user manually changes settings
 });
 
 /**
@@ -759,6 +1043,83 @@ elements.timeSignatureSelector.addEventListener('change', (e) => {
 elements.subdivisionSelector.addEventListener('change', (e) => {
   e.preventDefault();
   changeSubdivision(e.target.value);
+  clearCurrentPreset(); // Clear preset when user manually changes settings
+});
+
+/**
+ * Handle SAVE PRESET button click
+ */
+elements.savePresetButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  openPresetsModal();
+});
+
+/**
+ * Handle PRESETS button click
+ */
+elements.managePresetsButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  openPresetsModal();
+});
+
+/**
+ * Handle save new preset button in modal
+ */
+elements.saveNewPresetButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  saveNewPreset();
+});
+
+/**
+ * Handle close presets modal button
+ */
+elements.closePresetsButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  closePresetsModal();
+});
+
+/**
+ * Handle Enter/Escape keys in preset name input
+ */
+elements.presetNameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    saveNewPreset();
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    closePresetsModal();
+  }
+});
+
+/**
+ * Clear error message when user starts typing preset name
+ */
+elements.presetNameInput.addEventListener('input', () => {
+  elements.presetError.textContent = '';
+});
+
+/**
+ * Close modal when clicking on overlay background
+ */
+elements.presetsModal.addEventListener('click', (e) => {
+  if (e.target === elements.presetsModal) {
+    closePresetsModal();
+  }
+});
+
+/**
+ * Prevent spacebar from triggering tap when preset buttons have focus
+ */
+elements.savePresetButton.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' || e.key === ' ') {
+    e.stopPropagation();
+  }
+});
+
+elements.managePresetsButton.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' || e.key === ' ') {
+    e.stopPropagation();
+  }
 });
 
 /**
@@ -836,6 +1197,93 @@ const ThemeManager = {
 };
 
 // ============================================
+// PRESET MANAGEMENT
+// ============================================
+
+/**
+ * Preset system with factory presets + localStorage for user presets
+ */
+const PresetManager = {
+  storageKey: 'bpm-presets',
+  maxPresets: 20,
+
+  /**
+   * Get all presets (factory + user)
+   */
+  getAllPresets() {
+    const user = this.getUserPresets();
+    return [...FACTORY_PRESETS, ...user];
+  },
+
+  /**
+   * Get user-created presets from localStorage
+   */
+  getUserPresets() {
+    try {
+      const data = localStorage.getItem(this.storageKey);
+      return data ? JSON.parse(data) : [];
+    } catch (error) {
+      console.error('Error loading presets:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Add a new user preset
+   */
+  addPreset(name, bpm, timeSignature, subdivision) {
+    const userPresets = this.getUserPresets();
+
+    if (userPresets.length >= this.maxPresets) {
+      throw new Error(`Maximum ${this.maxPresets} user presets allowed`);
+    }
+
+    const preset = {
+      id: `user-${Date.now()}`,
+      name: name.trim(),
+      bpm,
+      timeSignature,
+      subdivision,
+      isFactory: false,
+      createdAt: Date.now()
+    };
+
+    userPresets.push(preset);
+    localStorage.setItem(this.storageKey, JSON.stringify(userPresets));
+    return preset;
+  },
+
+  /**
+   * Get a specific preset by ID
+   */
+  getPreset(id) {
+    return this.getAllPresets().find(p => p.id === id);
+  },
+
+  /**
+   * Delete a user preset (cannot delete factory presets)
+   */
+  deletePreset(id) {
+    // Cannot delete factory presets
+    if (id.startsWith('factory-')) {
+      console.warn('Cannot delete factory preset');
+      return;
+    }
+
+    let userPresets = this.getUserPresets();
+    userPresets = userPresets.filter(p => p.id !== id);
+    localStorage.setItem(this.storageKey, JSON.stringify(userPresets));
+  },
+
+  /**
+   * Initialize preset system
+   */
+  init() {
+    renderPresetsList();
+  }
+};
+
+// ============================================
 // INITIALIZATION
 // ============================================
 
@@ -844,3 +1292,6 @@ updateDisplay();
 
 // Initialize theme system
 ThemeManager.init();
+
+// Initialize preset system
+PresetManager.init();

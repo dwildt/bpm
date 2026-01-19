@@ -11,6 +11,7 @@ Find the current BPM (Beats Per Minute) of any song by tapping along to the beat
 - **Tap Detection**: Click the button or press spacebar to tap along with music
 - **Real-time BPM Calculation**: Automatic calculation based on tap intervals
 - **Manual BPM Input**: Directly enter a BPM value for instant metronome use
+- **Presets Management**: Save and load up to 20 custom configurations with factory presets included
 - **Metronome**: Lock a BPM and play audible clicks with multiple time signatures
 - **Multiple Time Signatures**: Support for 4/4, 3/4, and 2/4 time signatures
 - **Subdivisions**: Practice with quarter notes, eighth notes, sixteenth notes, or triplets
@@ -72,6 +73,53 @@ If you already know the desired BPM, you can enter it directly:
 - **Enter**: Confirm and set BPM
 - **Escape**: Cancel and close modal
 - **Tab**: Navigate between input and buttons
+
+### Managing Presets
+
+Save and load your favorite metronome configurations for quick access:
+
+1. **Using Factory Presets:**
+   - Click **PRESETS** to open the presets modal
+   - Browse the factory presets section (includes popular songs and tempos)
+   - Click **LOAD** on any preset to apply it instantly
+   - Factory presets cannot be deleted
+
+2. **Saving Your Own Presets:**
+   - Fix a BPM and configure time signature + subdivision
+   - Click **SAVE PRESET**
+   - Enter a name for your preset (e.g., "My Practice Song")
+   - Click **SAVE PRESET** in the modal
+   - Your preset is saved in the "My Presets" section
+
+3. **Loading Your Presets:**
+   - Click **PRESETS** to open the modal
+   - Find your preset in the "My Presets" section
+   - Click **LOAD** to apply the saved configuration
+   - The active preset is highlighted with a green glow
+
+4. **Deleting Presets:**
+   - Open the presets modal
+   - Click **DELETE** on any user-created preset
+   - Confirm the deletion
+   - Factory presets cannot be deleted
+
+**Preset Features:**
+- Save up to 20 custom presets
+- Each preset stores: BPM, time signature, and subdivision
+- Factory presets ship with the app (popular songs and tempos)
+- Presets persist across browser sessions
+- Active preset highlighted in the list
+- Preset cleared when manually changing settings
+
+**Example Factory Presets:**
+- **Camila Camila (Nenhum de Nós)** - 147 BPM, 4/4, Sixteenth Notes
+- **Jazz Waltz** - 160 BPM, 3/4, Triplets
+- **Moderate Rock** - 120 BPM, 4/4, Eighth Notes
+- **Slow Ballad** - 60 BPM, 4/4, Quarter Notes
+- **Uptempo Swing** - 180 BPM, 4/4, Triplets
+
+**Community Contributions:**
+Community members can contribute factory presets via pull requests to [presets.js](presets.js)!
 
 ## Local Development
 
@@ -166,6 +214,7 @@ bpm/
 ├── bpm.test.js        # Unit tests for BPM logic
 ├── metronome.js       # Pure metronome audio and timing logic
 ├── metronome.test.js  # Unit tests for metronome logic
+├── presets.js         # Factory presets (ES6 module)
 ├── package.json       # Node.js dependencies and scripts
 ├── eslint.config.js   # ESLint configuration
 ├── CLAUDE.md          # Claude Code development notes

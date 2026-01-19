@@ -544,6 +544,278 @@ body {
 }
 
 /* ============================================
+   PRESETS SECTION
+   ============================================ */
+
+.presets-section {
+    display: flex;
+    gap: var(--spacing-sm);
+    width: 100%;
+    max-width: 400px;
+    margin-top: var(--spacing-sm);
+}
+
+.save-preset-button,
+.manage-presets-button {
+    flex: 1;
+    font-family: var(--font-main);
+    font-size: clamp(0.6rem, 2vw, 0.8rem);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: transparent;
+    color: var(--color-accent);
+    border: 2px solid var(--color-accent);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.save-preset-button:hover:not(:disabled),
+.manage-presets-button:hover:not(:disabled) {
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    box-shadow: 0 0 10px var(--color-accent-glow);
+    transform: translateY(-2px);
+}
+
+.save-preset-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* ============================================
+   PRESETS MODAL
+   ============================================ */
+
+.presets-modal-content {
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.preset-save-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border: 2px dashed var(--color-border);
+    background-color: rgba(0, 0, 0, 0.3);
+    margin-bottom: var(--spacing-md);
+}
+
+.preset-name-input {
+    width: 100%;
+    font-family: var(--font-main);
+    font-size: clamp(0.7rem, 2vw, 0.9rem);
+    padding: var(--spacing-sm);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: var(--color-primary);
+    border: 2px solid var(--color-accent);
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.preset-name-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 15px var(--color-shadow);
+}
+
+.preset-save-confirm {
+    font-family: var(--font-main);
+    font-size: clamp(0.6rem, 2vw, 0.8rem);
+    padding: var(--spacing-sm);
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.preset-save-confirm:hover {
+    background-color: var(--color-primary);
+    color: var(--color-bg);
+    box-shadow: 0 0 10px var(--color-shadow);
+}
+
+/* ============================================
+   PRESETS LIST
+   ============================================ */
+
+.presets-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.presets-list-title {
+    font-family: var(--font-main);
+    font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+    color: var(--color-accent);
+    letter-spacing: 0.1em;
+    text-align: center;
+    margin: 0;
+}
+
+.preset-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
+}
+
+.preset-section-title {
+    font-family: var(--font-main);
+    font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+    color: var(--color-secondary);
+    letter-spacing: 0.1em;
+    text-align: center;
+    margin: 0 0 var(--spacing-xs) 0;
+    padding: var(--spacing-xs);
+    border-bottom: 2px dashed var(--color-border);
+}
+
+.presets-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    max-height: 40vh;
+    overflow-y: auto;
+    padding: var(--spacing-sm);
+    border: 2px dashed var(--color-border);
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.presets-empty {
+    font-family: var(--font-main);
+    font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+    color: var(--color-border);
+    text-align: center;
+    padding: var(--spacing-md);
+    line-height: 1.6;
+}
+
+.preset-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--color-border);
+    transition: all 0.2s ease;
+}
+
+.preset-item:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 10px var(--color-accent-glow);
+}
+
+.preset-item.active {
+    border-color: var(--color-primary);
+    background-color: rgba(0, 255, 0, 0.1);
+    box-shadow: 0 0 15px var(--color-shadow);
+}
+
+.preset-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.preset-name {
+    font-family: var(--font-main);
+    font-size: clamp(0.6rem, 2vw, 0.8rem);
+    color: var(--color-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.preset-details {
+    font-family: var(--font-main);
+    font-size: clamp(0.4rem, 1.5vw, 0.6rem);
+    color: var(--color-accent);
+}
+
+.preset-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-shrink: 0;
+}
+
+.preset-load-btn,
+.preset-delete-btn {
+    font-family: var(--font-main);
+    font-size: clamp(0.5rem, 1.5vw, 0.6rem);
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.preset-load-btn {
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+}
+
+.preset-load-btn:hover {
+    background-color: var(--color-primary);
+    color: var(--color-bg);
+    box-shadow: 0 0 10px var(--color-shadow);
+}
+
+.preset-delete-btn {
+    background-color: transparent;
+    color: var(--color-secondary);
+    border: 2px solid var(--color-secondary);
+}
+
+.preset-delete-btn:hover {
+    background-color: var(--color-secondary);
+    color: var(--color-bg);
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+}
+
+/* Scrollbar */
+.presets-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.presets-list::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.presets-list::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 4px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .presets-section {
+        flex-direction: column;
+    }
+
+    .preset-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .preset-actions {
+        justify-content: stretch;
+        width: 100%;
+    }
+
+    .preset-load-btn,
+    .preset-delete-btn {
+        flex: 1;
+    }
+}
+
+/* ============================================
    MODAL STYLING
    ============================================ */
 

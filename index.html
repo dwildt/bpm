@@ -62,6 +62,19 @@
                 </button>
             </div>
 
+            <!-- Presets Management Section -->
+            <div class="presets-section">
+                <button class="save-preset-button" id="savePresetButton"
+                        aria-label="Save current settings as preset"
+                        disabled>
+                    SAVE PRESET
+                </button>
+                <button class="manage-presets-button" id="managePresetsButton"
+                        aria-label="Manage saved presets">
+                    PRESETS
+                </button>
+            </div>
+
             <!-- BPM Input Modal -->
             <div class="modal-overlay" id="bpmModal" hidden>
                 <div class="modal-content" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
@@ -82,6 +95,44 @@
                     <div class="modal-actions">
                         <button class="modal-button modal-confirm" id="confirmBpmButton">OK</button>
                         <button class="modal-button modal-cancel" id="cancelBpmButton">CANCEL</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Presets Modal -->
+            <div class="modal-overlay" id="presetsModal" hidden>
+                <div class="modal-content presets-modal-content" role="dialog"
+                     aria-labelledby="presetsTitle" aria-modal="true">
+                    <h2 class="modal-title" id="presetsTitle">MANAGE PRESETS</h2>
+
+                    <div class="modal-body">
+                        <!-- Save New Preset Form -->
+                        <div class="preset-save-form">
+                            <label for="presetNameInput" class="modal-label">SAVE CURRENT AS:</label>
+                            <input type="text"
+                                   id="presetNameInput"
+                                   class="preset-name-input"
+                                   placeholder="e.g., Camila Camila"
+                                   maxlength="30"
+                                   autocomplete="off"
+                                   aria-describedby="presetError">
+                            <button class="preset-save-confirm" id="saveNewPresetButton">
+                                SAVE PRESET
+                            </button>
+                            <div class="modal-error" id="presetError" role="alert"></div>
+                        </div>
+
+                        <!-- Saved Presets List -->
+                        <div class="presets-list-container">
+                            <h3 class="presets-list-title">SAVED PRESETS:</h3>
+                            <div class="presets-list" id="presetsList">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button class="modal-button modal-cancel" id="closePresetsButton">CLOSE</button>
                     </div>
                 </div>
             </div>
@@ -153,6 +204,7 @@
 
     <script src="bpm.js"></script>
     <script src="metronome.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="presets.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>

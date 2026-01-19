@@ -131,6 +131,24 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) format:
 - Wrap at 72 characters
 - Can include bullet points
 
+### Development Workflow
+
+**CRITICAL: Always create a GitHub issue BEFORE starting any development work.**
+
+**Workflow:**
+1. **Create GitHub Issue** describing the feature, bug fix, or task
+2. **Plan the implementation** (if needed)
+3. **Implement the changes** referencing the issue
+4. **Commit with proper message** that closes the issue
+5. **Push to main** - issue closes automatically
+
+**Why this matters:**
+- Maintains clear project history
+- Enables discussion before implementation
+- Provides context for future reference
+- Automates issue tracking
+- Documents decision-making process
+
 ### Issue Referencing
 
 **CRITICAL: Always reference related GitHub issues in commit messages.**
