@@ -139,8 +139,8 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) format:
 1. **Create GitHub Issue** describing the feature, bug fix, or task
 2. **Plan the implementation** (if needed)
 3. **Implement the changes** referencing the issue
-4. **Commit with proper message** that closes the issue
-5. **Push to main** - issue closes automatically
+4. **Claude Code commits** with proper message that closes the issue
+5. **User pushes to main** - issue closes automatically
 
 **Why this matters:**
 - Maintains clear project history
@@ -148,6 +148,10 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) format:
 - Provides context for future reference
 - Automates issue tracking
 - Documents decision-making process
+
+**Claude Code Permissions:**
+- ✅ Can: git status, git add, git commit
+- ❌ Cannot: git push (user responsibility)
 
 ### Issue Referencing
 
