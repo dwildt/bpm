@@ -25,6 +25,10 @@ const state = {
   currentSubdivision: 0,       // Current subdivision index (0-based)
   // Preset state
   currentPresetId: null,       // Currently loaded preset ID
+  // Menu state
+  activeModule: 'bpm',         // Current active module ('bpm' | 'metronome' | 'tuner')
+  menuOpen: false,             // Sidebar menu state
+  lastCalculatedBPM: null,     // Track BPM from BPM Finder for auto-fix
 };
 
 // DOM Elements
@@ -56,6 +60,12 @@ const elements = {
   closePresetsButton: document.getElementById('closePresetsButton'),
   presetsList: document.getElementById('presetsList'),
   presetError: document.getElementById('presetError'),
+  // Menu elements
+  hamburgerButton: document.getElementById('hamburgerButton'),
+  sidebarMenu: document.getElementById('sidebarMenu'),
+  closeMenuButton: document.getElementById('closeMenuButton'),
+  menuOverlay: document.getElementById('menuOverlay'),
+  menuItems: document.querySelectorAll('.menu-item'),
 };
 
 // ============================================
@@ -903,6 +913,79 @@ function clearCurrentPreset() {
 }
 
 // ============================================
+// MENU FUNCTIONS
+// ============================================
+
+/**
+ * Open sidebar menu
+ */
+function openMenu() {
+  elements.sidebarMenu.classList.add('open');
+  elements.menuOverlay.classList.add('visible');
+  state.menuOpen = true;
+}
+
+/**
+ * Close sidebar menu
+ */
+function closeMenu() {
+  elements.sidebarMenu.classList.remove('open');
+  elements.menuOverlay.classList.remove('visible');
+  state.menuOpen = false;
+}
+
+/**
+ * Toggle menu open/closed
+ */
+function toggleMenu() {
+  if (state.menuOpen) {
+    closeMenu();
+  } else {
+    openMenu();
+  }
+}
+
+/**
+ * Switch to a different module
+ */
+function switchModule(moduleName) {
+  // Skip if same module or disabled
+  const moduleButton = document.querySelector(`[data-module="${moduleName}"]`);
+  if (state.activeModule === moduleName || moduleButton.classList.contains('disabled')) {
+    return;
+  }
+
+  // Stop metronome if switching away from metronome module
+  if (state.activeModule === 'metronome' && state.metronomeActive) {
+    stopMetronome();
+  }
+
+  // Hide all modules
+  document.querySelectorAll('.module').forEach(module => {
+    module.hidden = true;
+  });
+
+  // Remove active class from all menu items
+  elements.menuItems.forEach(item => {
+    item.classList.remove('active');
+  });
+
+  // Show selected module
+  document.getElementById(`${moduleName}-module`).hidden = false;
+
+  // Add active class to selected menu item
+  moduleButton.classList.add('active');
+
+  // Update state
+  state.activeModule = moduleName;
+
+  // Close menu after selection
+  closeMenu();
+
+  console.log(`Switched to module: ${moduleName}`);
+}
+
+// ============================================
 // EVENT LISTENERS
 // ============================================
 
@@ -915,9 +998,21 @@ elements.tapButton.addEventListener('click', (e) => {
 });
 
 /**
- * Handle keyboard events (spacebar)
+ * Handle keyboard events (spacebar and ESC)
  */
 document.addEventListener('keydown', (e) => {
+  // ESC key closes menu
+  if (e.key === 'Escape' && state.menuOpen) {
+    closeMenu();
+    return;
+  }
+
+  // Prevent spacebar tap when menu is open
+  if ((e.code === 'Space' || e.key === ' ') && state.menuOpen) {
+    e.preventDefault();
+    return;
+  }
+
   // Check if spacebar is pressed
   if (e.code === 'Space' || e.key === ' ') {
     e.preventDefault(); // Prevent page scroll
@@ -932,6 +1027,40 @@ elements.tapButton.addEventListener('keydown', (e) => {
   if (e.code === 'Space' || e.key === ' ') {
     e.preventDefault();
   }
+});
+
+/**
+ * Hamburger button click
+ */
+elements.hamburgerButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  toggleMenu();
+});
+
+/**
+ * Close button click
+ */
+elements.closeMenuButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  closeMenu();
+});
+
+/**
+ * Overlay click (close menu)
+ */
+elements.menuOverlay.addEventListener('click', () => {
+  closeMenu();
+});
+
+/**
+ * Menu item clicks
+ */
+elements.menuItems.forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    const moduleName = item.dataset.module;
+    switchModule(moduleName);
+  });
 });
 
 /**

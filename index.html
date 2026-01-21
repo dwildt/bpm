@@ -15,6 +15,49 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger-button" id="hamburgerButton" aria-label="Open menu">
+        <span class="hamburger-icon">☰</span>
+    </button>
+
+    <!-- Sidebar Menu -->
+    <nav class="sidebar-menu" id="sidebarMenu">
+        <div class="sidebar-header">
+            <h2 class="sidebar-title">MENU</h2>
+            <button class="close-menu-button" id="closeMenuButton" aria-label="Close menu">
+                ✕
+            </button>
+        </div>
+
+        <ul class="menu-list">
+            <li>
+                <button class="menu-item active" data-module="bpm">
+                    <span class="menu-icon">📊</span>
+                    <span class="menu-label">BPM Finder</span>
+                </button>
+            </li>
+            <li>
+                <button class="menu-item" data-module="metronome">
+                    <span class="menu-icon">🎵</span>
+                    <span class="menu-label">Metronome</span>
+                </button>
+            </li>
+            <li>
+                <button class="menu-item" data-module="tuner">
+                    <span class="menu-icon">🎸</span>
+                    <span class="menu-label">Tuner</span>
+                </button>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <p class="menu-hint">Select a module</p>
+        </div>
+    </nav>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
     <div class="container">
         <header class="header">
             <h1 class="title">BPM CALCULATOR</h1>
