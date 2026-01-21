@@ -97,27 +97,56 @@
             <div id="metronome-module" class="module" hidden>
                 <!-- Metronome Controls Section -->
                 <div class="metronome-section">
-                <button class="fix-bpm-button" id="fixBpmButton"
-                        aria-label="Lock current BPM for metronome"
-                        disabled>
-                    FIX BPM
-                </button>
+                    <button class="fix-bpm-button" id="fixBpmButton"
+                            aria-label="Lock current BPM for metronome"
+                            disabled>
+                        FIX BPM
+                    </button>
 
-                <div class="metronome-display">
-                    <span class="metronome-label">FIXED:</span>
-                    <span class="metronome-value" id="fixedBpmValue">---</span>
+                    <div class="metronome-display">
+                        <span class="metronome-label">FIXED:</span>
+                        <span class="metronome-value" id="fixedBpmValue">---</span>
+                    </div>
+
+                    <button class="play-metronome-button" id="playMetronomeButton"
+                            aria-label="Start metronome"
+                            disabled>
+                        <span class="play-icon">▶</span>
+                        <span class="play-text">PLAY</span>
+                    </button>
                 </div>
 
-                <button class="play-metronome-button" id="playMetronomeButton"
-                        aria-label="Start metronome"
-                        disabled>
-                    <span class="play-icon">▶</span>
-                    <span class="play-text">PLAY</span>
-                </button>
-            </div>
+                <!-- Time Signature Selector -->
+                <div class="time-signature-section">
+                    <label for="timeSignatureSelector" class="time-sig-label">TIME SIGNATURE:</label>
+                    <select id="timeSignatureSelector" class="time-sig-selector" aria-label="Select time signature">
+                        <option value="4/4" selected>4/4 (Common Time)</option>
+                        <option value="3/4">3/4 (Waltz)</option>
+                        <option value="2/4">2/4 (March)</option>
+                    </select>
+                </div>
 
-            <!-- Presets Management Section -->
-            <div class="presets-section">
+                <!-- Subdivision Selector -->
+                <div class="subdivision-section">
+                    <label for="subdivisionSelector" class="subdivision-label">SUBDIVISION:</label>
+                    <select id="subdivisionSelector" class="subdivision-selector" aria-label="Select subdivision">
+                        <option value="1/4" selected>♩ Quarter Notes</option>
+                        <option value="1/8">♪ Eighth Notes</option>
+                        <option value="1/16">♬ Sixteenth Notes</option>
+                        <option value="1/3">♪♪♪ Triplets</option>
+                    </select>
+                </div>
+
+                <!-- Beat Indicator -->
+                <div class="beat-indicator" id="beatIndicator">
+                    <div class="beat-dot" data-beat="0"></div>
+                    <div class="beat-dot" data-beat="1"></div>
+                    <div class="beat-dot" data-beat="2"></div>
+                    <div class="beat-dot" data-beat="3"></div>
+                </div>
+
+                <!-- Presets Management Section -->
+                <div class="presets-section">
                 <button class="save-preset-button" id="savePresetButton"
                         aria-label="Save current settings as preset"
                         disabled>
@@ -127,6 +156,12 @@
                         aria-label="Manage saved presets">
                     PRESETS
                 </button>
+            </div>
+            </div>
+
+            <!-- Tuner Module -->
+            <div id="tuner-module" class="module" hidden>
+                <!-- Tuner implementation will be added here -->
             </div>
 
             <!-- BPM Input Modal -->
@@ -189,41 +224,6 @@
                         <button class="modal-button modal-cancel" id="closePresetsButton">CLOSE</button>
                     </div>
                 </div>
-            </div>
-
-            <!-- Time Signature Selector -->
-            <div class="time-signature-section">
-                <label for="timeSignatureSelector" class="time-sig-label">TIME SIGNATURE:</label>
-                <select id="timeSignatureSelector" class="time-sig-selector" aria-label="Select time signature">
-                    <option value="4/4" selected>4/4 (Common Time)</option>
-                    <option value="3/4">3/4 (Waltz)</option>
-                    <option value="2/4">2/4 (March)</option>
-                </select>
-            </div>
-
-            <!-- Subdivision Selector -->
-            <div class="subdivision-section">
-                <label for="subdivisionSelector" class="subdivision-label">SUBDIVISION:</label>
-                <select id="subdivisionSelector" class="subdivision-selector" aria-label="Select subdivision">
-                    <option value="1/4" selected>♩ Quarter Notes</option>
-                    <option value="1/8">♪ Eighth Notes</option>
-                    <option value="1/16">♬ Sixteenth Notes</option>
-                    <option value="1/3">♪♪♪ Triplets</option>
-                </select>
-            </div>
-
-            <!-- Beat Indicator -->
-            <div class="beat-indicator" id="beatIndicator">
-                <div class="beat-dot" data-beat="0"></div>
-                <div class="beat-dot" data-beat="1"></div>
-                <div class="beat-dot" data-beat="2"></div>
-                <div class="beat-dot" data-beat="3"></div>
-            </div>
-            </div>
-
-            <!-- Tuner Module -->
-            <div id="tuner-module" class="module" hidden>
-                <!-- Tuner implementation will be added here -->
             </div>
         </main>
 

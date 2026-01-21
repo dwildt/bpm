@@ -955,6 +955,25 @@ function switchModule(moduleName) {
     return;
   }
 
+  // HYBRID AUTO-FIX LOGIC
+  // When switching TO metronome FROM bpm-finder: auto-fix if BPM calculated
+  if (moduleName === 'metronome' && state.activeModule === 'bpm') {
+    const calculatedBPM = calculateBPM();
+    if (calculatedBPM !== null && MetronomeLogic.isValidMetronomeBPM(calculatedBPM)) {
+      state.lastCalculatedBPM = calculatedBPM;
+      // Auto-fix BPM
+      state.fixedBPM = calculatedBPM;
+      updateMetronomeDisplay();
+      updateSubdivisionOptions();
+      elements.playMetronomeButton.disabled = false;
+      elements.savePresetButton.disabled = false;
+      elements.fixBpmButton.textContent = 'UNLOCK';
+      elements.fixBpmButton.classList.add('locked');
+      elements.fixBpmButton.disabled = false;
+      console.log(`Auto-fixed BPM to ${calculatedBPM} when switching to Metronome`);
+    }
+  }
+
   // Stop metronome if switching away from metronome module
   if (state.activeModule === 'metronome' && state.metronomeActive) {
     stopMetronome();
