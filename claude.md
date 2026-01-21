@@ -16,6 +16,65 @@ Claude Code is an intelligent coding assistant that helps developers:
 
 The project began with a clear request: build a BPM calculator with an 8-bit game aesthetic that can run on GitHub Pages. Claude Code:
 
+### Test-Driven Development
+
+**IMPORTANT: All new features MUST include unit tests.**
+
+When planning and implementing new features:
+
+1. **Create tests alongside feature implementation**
+   - Write unit tests for all new functions and logic
+   - Follow existing test patterns in `bpm.test.js` and `metronome.test.js`
+   - Use Jest testing framework (already configured)
+
+2. **Test requirements for feature implementation**
+   - Pure logic functions: **100% test coverage required**
+   - Business logic (calculations, validations): **Complete test coverage**
+   - DOM manipulation: Test when feasible (consider Testing Library for complex cases)
+   - Integration points: Add integration tests for workflows
+
+3. **Test organization**
+   ```
+   ├── bpm.js → bpm.test.js
+   ├── metronome.js → metronome.test.js
+   ├── presets.js → presets.test.js
+   └── [feature].js → [feature].test.js
+   ```
+
+4. **Running tests**
+   - `npm test` - Run all tests
+   - `npm run test:watch` - Watch mode during development
+   - `npm run test:coverage` - Check coverage report
+
+5. **Before creating pull request or commit**
+   - ✅ All tests pass
+   - ✅ New features have corresponding tests
+   - ✅ Test coverage maintained or improved
+   - ✅ No console errors in test output
+
+**Example test structure:**
+```javascript
+describe('FeatureName', () => {
+  describe('functionName', () => {
+    test('should handle normal case', () => {
+      expect(functionName(input)).toBe(expectedOutput);
+    });
+
+    test('should handle edge case', () => {
+      expect(functionName(edgeInput)).toBe(edgeOutput);
+    });
+
+    test('should throw error for invalid input', () => {
+      expect(() => functionName(invalid)).toThrow('Error message');
+    });
+  });
+});
+```
+
+### Original Planning Notes
+
+The original project planning:
+
 1. **Analyzed Requirements**
    - Explored the existing (empty) codebase
    - Evaluated technology options (Remix vs. vanilla JavaScript)
