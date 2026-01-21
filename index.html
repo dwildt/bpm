@@ -64,20 +64,39 @@
         </header>
 
         <main class="main">
-            <!-- BPM Display -->
-            <div class="bpm-display">
-                <div class="bpm-label">BPM</div>
-                <div class="bpm-value" id="bpmValue">---</div>
+            <!-- BPM Finder Module -->
+            <div id="bpm-module" class="module">
+                <!-- BPM Display -->
+                <div class="bpm-display">
+                    <div class="bpm-label">BPM</div>
+                    <div class="bpm-value" id="bpmValue">---</div>
+                </div>
+
+                <!-- Tap Button -->
+                <button class="tap-button" id="tapButton" aria-label="Tap to calculate BPM">
+                    <span class="tap-text">TAP HERE</span>
+                    <span class="tap-hint">(or spacebar)</span>
+                </button>
+
+                <!-- Manual BPM Input Section -->
+                <div class="manual-bpm-section">
+                    <button class="set-bpm-button" id="setBpmButton"
+                            aria-label="Set BPM manually">
+                        SET BPM
+                    </button>
+                </div>
+
+                <!-- Instructions -->
+                <div class="instructions">
+                    <p>Click the button or press SPACEBAR to tap along with the beat.</p>
+                    <p>The BPM will be calculated automatically.</p>
+                </div>
             </div>
 
-            <!-- Tap Button -->
-            <button class="tap-button" id="tapButton" aria-label="Tap to calculate BPM">
-                <span class="tap-text">TAP HERE</span>
-                <span class="tap-hint">(or spacebar)</span>
-            </button>
-
-            <!-- Metronome Controls Section -->
-            <div class="metronome-section">
+            <!-- Metronome Module -->
+            <div id="metronome-module" class="module" hidden>
+                <!-- Metronome Controls Section -->
+                <div class="metronome-section">
                 <button class="fix-bpm-button" id="fixBpmButton"
                         aria-label="Lock current BPM for metronome"
                         disabled>
@@ -94,14 +113,6 @@
                         disabled>
                     <span class="play-icon">▶</span>
                     <span class="play-text">PLAY</span>
-                </button>
-            </div>
-
-            <!-- Manual BPM Input Section -->
-            <div class="manual-bpm-section">
-                <button class="set-bpm-button" id="setBpmButton"
-                        aria-label="Set BPM manually">
-                    SET BPM
                 </button>
             </div>
 
@@ -208,11 +219,11 @@
                 <div class="beat-dot" data-beat="2"></div>
                 <div class="beat-dot" data-beat="3"></div>
             </div>
+            </div>
 
-            <!-- Instructions -->
-            <div class="instructions">
-                <p>Click the button or press SPACEBAR to tap along with the beat.</p>
-                <p>The BPM will be calculated automatically.</p>
+            <!-- Tuner Module -->
+            <div id="tuner-module" class="module" hidden>
+                <!-- Tuner implementation will be added here -->
             </div>
         </main>
 
