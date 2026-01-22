@@ -78,11 +78,12 @@
                     <span class="tap-hint">(or spacebar)</span>
                 </button>
 
-                <!-- Manual BPM Input Section -->
-                <div class="manual-bpm-section">
-                    <button class="set-bpm-button" id="setBpmButton"
-                            aria-label="Set BPM manually">
-                        SET BPM
+                <!-- Go to Metronome Button -->
+                <div class="go-to-metronome-section">
+                    <button class="go-to-metronome-button" id="goToMetronomeButton"
+                            aria-label="Fix BPM and go to metronome"
+                            disabled>
+                        GO TO METRONOME
                     </button>
                 </div>
 
@@ -97,16 +98,21 @@
             <div id="metronome-module" class="module" hidden>
                 <!-- Metronome Controls Section -->
                 <div class="metronome-section">
-                    <button class="fix-bpm-button" id="fixBpmButton"
-                            aria-label="Lock current BPM for metronome"
-                            disabled>
-                        FIX BPM
-                    </button>
-
                     <div class="metronome-display">
-                        <span class="metronome-label">FIXED:</span>
+                        <span class="metronome-label">BPM:</span>
                         <span class="metronome-value" id="fixedBpmValue">---</span>
                     </div>
+
+                    <button class="set-bpm-button" id="setBpmButton"
+                            aria-label="Set BPM manually">
+                        SET BPM
+                    </button>
+
+                    <button class="unlock-bpm-button" id="unlockBpmButton"
+                            aria-label="Unlock BPM"
+                            disabled>
+                        UNLOCK
+                    </button>
 
                     <button class="play-metronome-button" id="playMetronomeButton"
                             aria-label="Start metronome"

@@ -35,8 +35,10 @@ const state = {
 const elements = {
   tapButton: document.getElementById('tapButton'),
   bpmValue: document.getElementById('bpmValue'),
+  // BPM Finder elements
+  goToMetronomeButton: document.getElementById('goToMetronomeButton'),
   // Metronome elements
-  fixBpmButton: document.getElementById('fixBpmButton'),
+  unlockBpmButton: document.getElementById('unlockBpmButton'),
   playMetronomeButton: document.getElementById('playMetronomeButton'),
   fixedBpmValue: document.getElementById('fixedBpmValue'),
   beatIndicator: document.getElementById('beatIndicator'),
@@ -89,13 +91,13 @@ function updateDisplay() {
   // Update BPM display
   if (bpm !== null) {
     elements.bpmValue.textContent = bpm;
-    // Enable fix button if not already fixed and metronome not playing
-    if (state.fixedBPM === null && !state.metronomeActive) {
-      elements.fixBpmButton.disabled = false;
+    // Enable GO TO METRONOME button if BPM is valid
+    if (MetronomeLogic.isValidMetronomeBPM(bpm)) {
+      elements.goToMetronomeButton.disabled = false;
     }
   } else {
     elements.bpmValue.textContent = '---';
-    elements.fixBpmButton.disabled = true;
+    elements.goToMetronomeButton.disabled = true;
   }
 
   // Update metronome display
@@ -154,6 +156,46 @@ function reset() {
 }
 
 // ============================================
+// BPM FINDER TO METRONOME FUNCTIONS
+// ============================================
+
+/**
+ * Go to metronome with current calculated BPM
+ */
+function goToMetronome() {
+  const bpm = calculateBPM();
+
+  if (bpm === null || !MetronomeLogic.isValidMetronomeBPM(bpm)) {
+    console.warn('Cannot go to metronome: invalid BPM');
+    return;
+  }
+
+  // Fix the BPM
+  state.fixedBPM = bpm;
+  state.lastCalculatedBPM = bpm;
+
+  // Clear any pending auto-reset timer
+  if (state.resetTimer) {
+    clearTimeout(state.resetTimer);
+    state.resetTimer = null;
+  }
+
+  // Update metronome display
+  updateMetronomeDisplay();
+  updateSubdivisionOptions();
+
+  // Enable controls
+  elements.playMetronomeButton.disabled = false;
+  elements.savePresetButton.disabled = false;
+  elements.unlockBpmButton.disabled = false;
+
+  // Switch to metronome module
+  switchModule('metronome');
+
+  console.log(`Fixed BPM to ${bpm} and switched to Metronome`);
+}
+
+// ============================================
 // METRONOME FUNCTIONS
 // ============================================
 
@@ -184,46 +226,7 @@ function updateBeatIndicator() {
 }
 
 /**
- * Fix/lock the current BPM for metronome use
- */
-function fixBPM() {
-  const bpm = calculateBPM();
-
-  if (bpm !== null && MetronomeLogic.isValidMetronomeBPM(bpm)) {
-    // Clear any pending auto-reset timer when fixing BPM
-    if (state.resetTimer) {
-      clearTimeout(state.resetTimer);
-      state.resetTimer = null;
-    }
-
-    state.fixedBPM = bpm;
-    updateMetronomeDisplay();
-
-    // Update subdivision options based on BPM
-    updateSubdivisionOptions();
-
-    // Enable play button
-    elements.playMetronomeButton.disabled = false;
-
-    // Enable save preset button
-    elements.savePresetButton.disabled = false;
-
-    // Update fix button text to show it's locked
-    elements.fixBpmButton.textContent = 'UNLOCK';
-    elements.fixBpmButton.classList.add('locked');
-
-    // Visual feedback
-    elements.fixBpmButton.classList.add('active');
-    setTimeout(() => {
-      elements.fixBpmButton.classList.remove('active');
-    }, 200);
-  } else if (bpm !== null && !MetronomeLogic.isValidMetronomeBPM(bpm)) {
-    console.warn(`BPM ${bpm} is outside valid metronome range (30-300)`);
-  }
-}
-
-/**
- * Unlock the fixed BPM
+ * Unlock the fixed BPM and return to BPM Finder
  */
 function unlockBPM() {
   // Stop metronome if playing
@@ -235,37 +238,16 @@ function unlockBPM() {
   state.fixedBPM = null;
   updateMetronomeDisplay();
 
-  // Reset taps to start fresh
-  state.taps = [];
-
-  // Clear any pending reset timer
-  clearTimeout(state.resetTimer);
-  state.resetTimer = null;
-
-  // Disable play button
+  // Disable metronome controls
   elements.playMetronomeButton.disabled = true;
-
-  // Disable save preset button
   elements.savePresetButton.disabled = true;
+  elements.unlockBpmButton.disabled = true;
   state.currentPresetId = null;
 
-  // Update fix button text
-  elements.fixBpmButton.textContent = 'FIX BPM';
-  elements.fixBpmButton.classList.remove('locked');
+  // Switch back to BPM Finder
+  switchModule('bpm');
 
-  // Update all displays
-  updateDisplay();
-}
-
-/**
- * Toggle fix/unlock BPM
- */
-function toggleFixBPM() {
-  if (state.fixedBPM === null) {
-    fixBPM();
-  } else {
-    unlockBPM();
-  }
+  console.log('Unlocked BPM and returned to BPM Finder');
 }
 
 /**
@@ -343,8 +325,8 @@ function startMetronome() {
     elements.playMetronomeButton.classList.add('playing');
     elements.playMetronomeButton.setAttribute('aria-label', 'Stop metronome');
 
-    // Disable fix button while playing
-    elements.fixBpmButton.disabled = true;
+    // Disable UNLOCK button while playing
+    elements.unlockBpmButton.disabled = true;
 
     // Disable SET BPM button while playing
     updateSetBpmButtonState();
@@ -394,9 +376,6 @@ function stopMetronome() {
     '<span class="play-icon">▶</span><span class="play-text">PLAY</span>';
   elements.playMetronomeButton.classList.remove('playing');
   elements.playMetronomeButton.setAttribute('aria-label', 'Start metronome');
-
-  // Re-enable fix button
-  elements.fixBpmButton.disabled = false;
 
   // Re-enable SET BPM button
   updateSetBpmButtonState();
@@ -499,25 +478,17 @@ function setManualBPM(bpm) {
   state.fixedBPM = bpm;
 
   // Update displays
-  updateDisplay();
   updateMetronomeDisplay();
 
   // Update subdivision options based on BPM
   updateSubdivisionOptions();
 
-  // Enable play button
+  // Enable metronome controls
   elements.playMetronomeButton.disabled = false;
-
-  // Enable save preset button
   elements.savePresetButton.disabled = false;
+  elements.unlockBpmButton.disabled = false;
 
-  // Update fix button to show locked state
-  elements.fixBpmButton.textContent = 'UNLOCK';
-  elements.fixBpmButton.classList.add('locked');
-  elements.fixBpmButton.disabled = false;
-
-  // Show visual feedback
-  elements.bpmValue.textContent = bpm;
+  console.log(`Manually set BPM to ${bpm}`);
 }
 
 /**
@@ -765,10 +736,8 @@ function loadPreset(presetId) {
   // Enable play button
   elements.playMetronomeButton.disabled = false;
 
-  // Update fix button to locked state
-  elements.fixBpmButton.textContent = 'UNLOCK';
-  elements.fixBpmButton.classList.add('locked');
-  elements.fixBpmButton.disabled = false;
+  // Enable unlock button
+  elements.unlockBpmButton.disabled = false;
 
   // Enable save preset button
   elements.savePresetButton.disabled = false;
@@ -951,27 +920,8 @@ function toggleMenu() {
 function switchModule(moduleName) {
   // Skip if same module or disabled
   const moduleButton = document.querySelector(`[data-module="${moduleName}"]`);
-  if (state.activeModule === moduleName || moduleButton.classList.contains('disabled')) {
+  if (state.activeModule === moduleName || moduleButton?.classList.contains('disabled')) {
     return;
-  }
-
-  // HYBRID AUTO-FIX LOGIC
-  // When switching TO metronome FROM bpm-finder: auto-fix if BPM calculated
-  if (moduleName === 'metronome' && state.activeModule === 'bpm') {
-    const calculatedBPM = calculateBPM();
-    if (calculatedBPM !== null && MetronomeLogic.isValidMetronomeBPM(calculatedBPM)) {
-      state.lastCalculatedBPM = calculatedBPM;
-      // Auto-fix BPM
-      state.fixedBPM = calculatedBPM;
-      updateMetronomeDisplay();
-      updateSubdivisionOptions();
-      elements.playMetronomeButton.disabled = false;
-      elements.savePresetButton.disabled = false;
-      elements.fixBpmButton.textContent = 'UNLOCK';
-      elements.fixBpmButton.classList.add('locked');
-      elements.fixBpmButton.disabled = false;
-      console.log(`Auto-fixed BPM to ${calculatedBPM} when switching to Metronome`);
-    }
   }
 
   // Stop metronome if switching away from metronome module
@@ -992,14 +942,18 @@ function switchModule(moduleName) {
   // Show selected module
   document.getElementById(`${moduleName}-module`).hidden = false;
 
-  // Add active class to selected menu item
-  moduleButton.classList.add('active');
+  // Add active class to selected menu item if exists (hamburger menu)
+  if (moduleButton) {
+    moduleButton.classList.add('active');
+  }
 
   // Update state
   state.activeModule = moduleName;
 
-  // Close menu after selection
-  closeMenu();
+  // Close menu after selection (if open)
+  if (state.menuOpen) {
+    closeMenu();
+  }
 
   console.log(`Switched to module: ${moduleName}`);
 }
@@ -1083,11 +1037,19 @@ elements.menuItems.forEach(item => {
 });
 
 /**
- * Handle fix BPM button click
+ * Handle GO TO METRONOME button click
  */
-elements.fixBpmButton.addEventListener('click', (e) => {
+elements.goToMetronomeButton.addEventListener('click', (e) => {
   e.preventDefault();
-  toggleFixBPM();
+  goToMetronome();
+});
+
+/**
+ * Handle UNLOCK button click
+ */
+elements.unlockBpmButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  unlockBPM();
 });
 
 /**
@@ -1101,7 +1063,13 @@ elements.playMetronomeButton.addEventListener('click', (e) => {
 /**
  * Prevent spacebar from triggering metronome buttons
  */
-elements.fixBpmButton.addEventListener('keydown', (e) => {
+elements.goToMetronomeButton.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' || e.key === ' ') {
+    e.stopPropagation();
+  }
+});
+
+elements.unlockBpmButton.addEventListener('keydown', (e) => {
   if (e.code === 'Space' || e.key === ' ') {
     e.stopPropagation();
   }

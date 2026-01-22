@@ -246,37 +246,66 @@ body {
     gap: var(--spacing-sm);
 }
 
-.fix-bpm-button {
+/* GO TO METRONOME button (BPM Finder) */
+.go-to-metronome-section {
+    width: 100%;
+    max-width: 400px;
+    margin: var(--spacing-sm) 0;
+}
+
+.go-to-metronome-button {
+    font-family: var(--font-main);
+    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+    padding: var(--spacing-md);
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 3px dashed var(--color-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.go-to-metronome-button:hover:not(:disabled) {
+    background-color: var(--color-primary);
+    color: var(--color-bg);
+    box-shadow: 0 0 15px var(--color-shadow);
+    border-style: solid;
+}
+
+.go-to-metronome-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.go-to-metronome-button:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+/* UNLOCK button (Metronome) */
+.unlock-bpm-button {
     font-family: var(--font-main);
     font-size: clamp(0.6rem, 2vw, 0.8rem);
     padding: var(--spacing-sm) var(--spacing-md);
-    background-color: transparent;
-    color: var(--color-accent);
-    border: 2px solid var(--color-accent);
+    background-color: var(--color-secondary);
+    color: var(--color-bg);
+    border: 2px solid var(--color-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
     flex: 1;
 }
 
-.fix-bpm-button:hover:not(:disabled) {
-    background-color: var(--color-accent);
-    color: var(--color-bg);
-    box-shadow: 0 0 10px var(--color-accent-glow);
+.unlock-bpm-button:hover:not(:disabled) {
+    background-color: transparent;
+    color: var(--color-secondary);
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
 }
 
-.fix-bpm-button.locked {
-    background-color: var(--color-accent);
-    color: var(--color-bg);
-    border-color: var(--color-accent);
-}
-
-.fix-bpm-button:disabled {
+.unlock-bpm-button:disabled {
     opacity: 0.3;
     cursor: not-allowed;
 }
 
-.fix-bpm-button:active:not(:disabled),
-.fix-bpm-button.active {
+.unlock-bpm-button:active:not(:disabled) {
     transform: scale(0.95);
 }
 
@@ -1330,7 +1359,8 @@ body {
         gap: var(--spacing-sm);
     }
 
-    .fix-bpm-button,
+    .set-bpm-button,
+    .unlock-bpm-button,
     .metronome-display,
     .play-metronome-button {
         width: 100%;
