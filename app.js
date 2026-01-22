@@ -1143,6 +1143,22 @@ function toggleMenu() {
   }
 }
 
+// ============================================
+// DEEP LINKING SUPPORT
+// ============================================
+
+/**
+ * Parse URL hash and return valid module name
+ * @returns {string} Module name ('bpm', 'metronome', 'tuner')
+ */
+function parseModuleFromHash() {
+  const hash = window.location.hash.slice(1).toLowerCase(); // Remove # and normalize
+  const validModules = ['bpm', 'metronome', 'tuner'];
+
+  // Return hash if valid, otherwise default to 'bpm'
+  return validModules.includes(hash) ? hash : 'bpm';
+}
+
 /**
  * Switch to a different module
  */
@@ -1187,6 +1203,11 @@ function switchModule(moduleName) {
   // Close menu after selection (if open)
   if (state.menuOpen) {
     closeMenu();
+  }
+
+  // Update URL hash to reflect current module (without page reload)
+  if (window.location.hash !== `#${moduleName}`) {
+    window.history.replaceState(null, '', `#${moduleName}`);
   }
 
   console.log(`Switched to module: ${moduleName}`);
@@ -1575,6 +1596,14 @@ if (elements.stopTunerButton) {
   console.error('stopTunerButton not found in DOM!');
 }
 
+// Handle browser back/forward and manual hash changes
+window.addEventListener('hashchange', () => {
+  const module = parseModuleFromHash();
+  if (state.activeModule !== module) {
+    switchModule(module);
+  }
+});
+
 // ============================================
 // PRESET MANAGEMENT
 // ============================================
@@ -1674,3 +1703,10 @@ ThemeManager.init();
 
 // Initialize preset system
 PresetManager.init();
+
+// Initialize module from URL hash
+const initialModule = parseModuleFromHash();
+if (initialModule !== 'bpm') {
+  // Only call switchModule if not default (BPM is already visible)
+  switchModule(initialModule);
+}
