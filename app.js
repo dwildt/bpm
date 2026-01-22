@@ -40,6 +40,8 @@ const state = {
   centOffset: null,            // Offset in cents from target (+/-)
   tunerTolerance: 5,           // Cents tolerance for "in tune" (± 5 cents)
   referenceA4: 440,            // Reference pitch (A4 = 440 Hz)
+  lastNoteTime: null,          // Timestamp of last note detection
+  noteHoldDuration: 2500,      // How long to hold a note (2.5 seconds)
 };
 
 // DOM Elements
@@ -501,6 +503,7 @@ function stopTuner() {
   state.detectedNote = null;
   state.targetFrequency = null;
   state.centOffset = null;
+  state.lastNoteTime = null;
 
   // Update UI
   updateTunerDisplay();
@@ -536,18 +539,33 @@ function tunerDetectionLoop() {
       const targetFreq = TunerLogic.getNoteFrequency(note, state.referenceA4);
       const offset = TunerLogic.calculateCentOffset(frequency, targetFreq);
 
-      // Update state
-      state.detectedFrequency = frequency;
-      state.detectedNote = note;
-      state.targetFrequency = targetFreq;
-      state.centOffset = offset;
+      // Only update if it's a new note OR updating the same note
+      const isNewNote = state.detectedNote !== note;
+      const now = Date.now();
+
+      if (isNewNote || state.detectedNote === note) {
+        // Update state
+        state.detectedFrequency = frequency;
+        state.detectedNote = note;
+        state.targetFrequency = targetFreq;
+        state.centOffset = offset;
+        state.lastNoteTime = now;
+      }
     }
   } else {
-    // No pitch detected
-    state.detectedFrequency = null;
-    state.detectedNote = null;
-    state.targetFrequency = null;
-    state.centOffset = null;
+    // No pitch detected - check if we should clear the display
+    const now = Date.now();
+    const timeSinceLastNote = state.lastNoteTime ? now - state.lastNoteTime : Infinity;
+
+    // Only clear if hold duration has passed
+    if (timeSinceLastNote > state.noteHoldDuration) {
+      state.detectedFrequency = null;
+      state.detectedNote = null;
+      state.targetFrequency = null;
+      state.centOffset = null;
+      state.lastNoteTime = null;
+    }
+    // Otherwise, keep displaying the last detected note
   }
 
   // Update display
@@ -1532,15 +1550,30 @@ const ThemeManager = {
 // EVENT LISTENERS - TUNER
 // ============================================
 
-elements.startTunerButton.addEventListener('click', (e) => {
-  e.preventDefault();
-  startTuner();
+console.log('Tuner elements:', {
+  startButton: elements.startTunerButton,
+  stopButton: elements.stopTunerButton
 });
 
-elements.stopTunerButton.addEventListener('click', (e) => {
-  e.preventDefault();
-  stopTuner();
-});
+if (elements.startTunerButton) {
+  elements.startTunerButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log('Start tuner button clicked!');
+    startTuner();
+  });
+} else {
+  console.error('startTunerButton not found in DOM!');
+}
+
+if (elements.stopTunerButton) {
+  elements.stopTunerButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log('Stop tuner button clicked!');
+    stopTuner();
+  });
+} else {
+  console.error('stopTunerButton not found in DOM!');
+}
 
 // ============================================
 // PRESET MANAGEMENT
