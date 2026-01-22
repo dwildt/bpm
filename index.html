@@ -167,7 +167,62 @@
 
             <!-- Tuner Module -->
             <div id="tuner-module" class="module" hidden>
-                <!-- Tuner implementation will be added here -->
+                <!-- Tuner Display Section -->
+                <div class="tuner-display-section">
+                    <div class="tuner-note-display" id="tunerNoteDisplay">
+                        <div class="tuner-note-label">NOTE</div>
+                        <div class="tuner-note-value">---</div>
+                    </div>
+
+                    <div class="tuner-frequency-display" id="tunerFrequencyDisplay">
+                        <div class="tuner-freq-label">FREQUENCY</div>
+                        <div class="tuner-freq-value">--- Hz</div>
+                    </div>
+                </div>
+
+                <!-- Cents Offset Display -->
+                <div class="tuner-cents-display" id="tunerCentsDisplay">
+                    <div class="tuner-cents-label">OFFSET</div>
+                    <div class="tuner-cents-value">---</div>
+                </div>
+
+                <!-- Tuning Meter (Needle) -->
+                <div class="tuner-meter" id="tunerMeter">
+                    <div class="tuner-meter-scale">
+                        <span class="scale-marker">-50</span>
+                        <span class="scale-marker">-25</span>
+                        <span class="scale-marker center">0</span>
+                        <span class="scale-marker">+25</span>
+                        <span class="scale-marker">+50</span>
+                    </div>
+                    <div class="tuner-needle" id="tunerNeedle"></div>
+                    <div class="tuner-meter-bar">
+                        <div class="meter-flat-zone"></div>
+                        <div class="meter-intune-zone"></div>
+                        <div class="meter-sharp-zone"></div>
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="tuner-controls">
+                    <button class="tuner-button start-button" id="startTunerButton" aria-label="Start listening to microphone">
+                        ▶ START LISTENING
+                    </button>
+                    <button class="tuner-button stop-button" id="stopTunerButton" hidden aria-label="Stop listening">
+                        ■ STOP
+                    </button>
+                </div>
+
+                <!-- Status Display -->
+                <div class="tuner-status" id="tunerStatus">
+                    Click START to begin tuning
+                </div>
+
+                <!-- Instructions -->
+                <div class="tuner-instructions">
+                    <p>Play or sing a note to see it detected in real-time.</p>
+                    <p>Green zone = in tune (± 5 cents)</p>
+                </div>
             </div>
 
             <!-- BPM Input Modal -->
@@ -264,6 +319,7 @@
 
     <script src="bpm.js"></script>
     <script src="metronome.js"></script>
+    <script src="tuner.js"></script>
     <script type="module" src="presets.js"></script>
     <script type="module" src="app.js"></script>
 </body>

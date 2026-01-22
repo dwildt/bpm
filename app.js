@@ -29,6 +29,17 @@ const state = {
   activeModule: 'bpm',         // Current active module ('bpm' | 'metronome' | 'tuner')
   menuOpen: false,             // Sidebar menu state
   lastCalculatedBPM: null,     // Track BPM from BPM Finder for auto-fix
+  // Tuner state
+  tunerActive: false,          // Whether tuner is listening
+  mediaStream: null,           // Microphone stream (for cleanup)
+  analyserNode: null,          // Web Audio analyser node
+  tunerUpdateId: null,         // requestAnimationFrame ID (for cleanup)
+  detectedFrequency: null,     // Detected frequency in Hz
+  detectedNote: null,          // Detected note name (e.g., "A4")
+  targetFrequency: null,       // Target frequency for detected note
+  centOffset: null,            // Offset in cents from target (+/-)
+  tunerTolerance: 5,           // Cents tolerance for "in tune" (± 5 cents)
+  referenceA4: 440,            // Reference pitch (A4 = 440 Hz)
 };
 
 // DOM Elements
@@ -68,6 +79,15 @@ const elements = {
   closeMenuButton: document.getElementById('closeMenuButton'),
   menuOverlay: document.getElementById('menuOverlay'),
   menuItems: document.querySelectorAll('.menu-item'),
+  // Tuner elements
+  startTunerButton: document.getElementById('startTunerButton'),
+  stopTunerButton: document.getElementById('stopTunerButton'),
+  tunerNoteDisplay: document.getElementById('tunerNoteDisplay'),
+  tunerFrequencyDisplay: document.getElementById('tunerFrequencyDisplay'),
+  tunerCentsDisplay: document.getElementById('tunerCentsDisplay'),
+  tunerNeedle: document.getElementById('tunerNeedle'),
+  tunerMeter: document.getElementById('tunerMeter'),
+  tunerStatus: document.getElementById('tunerStatus'),
 };
 
 // ============================================
@@ -396,6 +416,197 @@ function toggleMetronome() {
   } else {
     startMetronome();
   }
+}
+
+// ============================================
+// TUNER FUNCTIONS
+// ============================================
+
+/**
+ * Start listening to microphone
+ */
+async function startTuner() {
+  try {
+    // Request microphone access
+    state.mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: false,
+        autoGainControl: false,
+        noiseSuppression: false,
+      }
+    });
+
+    // Create audio context if needed
+    if (!state.audioContext || state.audioContext.state === 'closed') {
+      state.audioContext = MetronomeLogic.createAudioContext();
+    }
+
+    // Resume if suspended
+    if (state.audioContext.state === 'suspended') {
+      await state.audioContext.resume();
+    }
+
+    // Create analyser node
+    state.analyserNode = state.audioContext.createAnalyser();
+    state.analyserNode.fftSize = 2048; // Good balance for pitch detection
+    state.analyserNode.smoothingTimeConstant = 0.8;
+
+    // Connect microphone to analyser
+    const source = state.audioContext.createMediaStreamSource(state.mediaStream);
+    source.connect(state.analyserNode);
+
+    // Start detection loop
+    state.tunerActive = true;
+    updateTunerStatus('Listening...');
+    elements.startTunerButton.hidden = true;
+    elements.stopTunerButton.hidden = false;
+
+    // Start update loop
+    tunerDetectionLoop();
+
+    console.log('Tuner started successfully');
+  } catch (error) {
+    console.error('Failed to start tuner:', error);
+    updateTunerStatus('Error: Microphone access denied');
+    alert('Microphone access is required for the tuner. Please allow microphone access and try again.');
+  }
+}
+
+/**
+ * Stop listening to microphone
+ */
+function stopTuner() {
+  state.tunerActive = false;
+
+  // Cancel animation frame
+  if (state.tunerUpdateId) {
+    cancelAnimationFrame(state.tunerUpdateId);
+    state.tunerUpdateId = null;
+  }
+
+  // Stop microphone stream
+  if (state.mediaStream) {
+    state.mediaStream.getTracks().forEach(track => track.stop());
+    state.mediaStream = null;
+  }
+
+  // Disconnect analyser
+  if (state.analyserNode) {
+    state.analyserNode.disconnect();
+    state.analyserNode = null;
+  }
+
+  // Reset state
+  state.detectedFrequency = null;
+  state.detectedNote = null;
+  state.targetFrequency = null;
+  state.centOffset = null;
+
+  // Update UI
+  updateTunerDisplay();
+  updateTunerStatus('Click START to begin tuning');
+  elements.startTunerButton.hidden = false;
+  elements.stopTunerButton.hidden = true;
+
+  console.log('Tuner stopped');
+}
+
+/**
+ * Detection loop (requestAnimationFrame)
+ */
+function tunerDetectionLoop() {
+  if (!state.tunerActive) {
+    return;
+  }
+
+  // Get audio data
+  const bufferLength = state.analyserNode.fftSize;
+  const buffer = new Float32Array(bufferLength);
+  state.analyserNode.getFloatTimeDomainData(buffer);
+
+  // Detect pitch
+  const frequency = TunerLogic.detectPitch(buffer, state.audioContext.sampleRate);
+
+  if (frequency !== null) {
+    // Convert to note
+    const note = TunerLogic.frequencyToNote(frequency, state.referenceA4);
+
+    if (note !== null) {
+      // Calculate target frequency and offset
+      const targetFreq = TunerLogic.getNoteFrequency(note, state.referenceA4);
+      const offset = TunerLogic.calculateCentOffset(frequency, targetFreq);
+
+      // Update state
+      state.detectedFrequency = frequency;
+      state.detectedNote = note;
+      state.targetFrequency = targetFreq;
+      state.centOffset = offset;
+    }
+  } else {
+    // No pitch detected
+    state.detectedFrequency = null;
+    state.detectedNote = null;
+    state.targetFrequency = null;
+    state.centOffset = null;
+  }
+
+  // Update display
+  updateTunerDisplay();
+
+  // Continue loop
+  state.tunerUpdateId = requestAnimationFrame(tunerDetectionLoop);
+}
+
+/**
+ * Update tuner display
+ */
+function updateTunerDisplay() {
+  const noteDisplay = elements.tunerNoteDisplay.querySelector('.tuner-note-value');
+  const freqDisplay = elements.tunerFrequencyDisplay.querySelector('.tuner-freq-value');
+  const centsDisplay = elements.tunerCentsDisplay.querySelector('.tuner-cents-value');
+  const needle = elements.tunerNeedle;
+
+  if (state.detectedNote && state.detectedFrequency && state.centOffset !== null) {
+    // Update note
+    noteDisplay.textContent = state.detectedNote;
+
+    // Update frequency
+    freqDisplay.textContent = `${state.detectedFrequency} Hz`;
+
+    // Update cents
+    const centText = state.centOffset >= 0 ? `+${state.centOffset}¢` : `${state.centOffset}¢`;
+    centsDisplay.textContent = centText;
+
+    // Update cents color
+    centsDisplay.classList.remove('flat', 'intune', 'sharp');
+    if (TunerLogic.isInTune(state.centOffset, state.tunerTolerance)) {
+      centsDisplay.classList.add('intune');
+    } else if (state.centOffset < 0) {
+      centsDisplay.classList.add('flat');
+    } else {
+      centsDisplay.classList.add('sharp');
+    }
+
+    // Update needle position (-50 to +50 cents range)
+    const clampedOffset = Math.max(-50, Math.min(50, state.centOffset));
+    const rotation = (clampedOffset / 50) * 45; // ±45 degrees
+    needle.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+    needle.style.display = 'block';
+  } else {
+    // No signal
+    noteDisplay.textContent = '---';
+    freqDisplay.textContent = '--- Hz';
+    centsDisplay.textContent = '---';
+    centsDisplay.classList.remove('flat', 'intune', 'sharp');
+    needle.style.display = 'none';
+  }
+}
+
+/**
+ * Update tuner status message
+ */
+function updateTunerStatus(message) {
+  elements.tunerStatus.textContent = message;
 }
 
 // ============================================
@@ -929,6 +1140,11 @@ function switchModule(moduleName) {
     stopMetronome();
   }
 
+  // Stop tuner if switching away from tuner module
+  if (state.activeModule === 'tuner' && state.tunerActive) {
+    stopTuner();
+  }
+
   // Hide all modules
   document.querySelectorAll('.module').forEach(module => {
     module.hidden = true;
@@ -1311,6 +1527,20 @@ const ThemeManager = {
     });
   }
 };
+
+// ============================================
+// EVENT LISTENERS - TUNER
+// ============================================
+
+elements.startTunerButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  startTuner();
+});
+
+elements.stopTunerButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  stopTuner();
+});
 
 // ============================================
 // PRESET MANAGEMENT
