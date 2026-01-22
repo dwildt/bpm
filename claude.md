@@ -71,6 +71,29 @@ describe('FeatureName', () => {
 });
 ```
 
+### Development Commands
+
+**Standard NPM Commands:**
+
+1. **Development Server**
+   - `npm run serve` - Start local development server on port 8080 and open in browser
+   - Server will be available at http://localhost:8080
+
+2. **Testing**
+   - `npm test` - Run all tests once
+   - `npm run test:watch` - Watch mode for continuous testing during development
+   - `npm run test:coverage` - Generate test coverage report
+
+3. **Code Quality**
+   - `npm run lint` - Check code for linting errors
+   - `npm run lint:fix` - Automatically fix linting errors
+
+**Important Notes:**
+- Always use `npm run serve` to start the development server (not `npm start`)
+- Server automatically opens the application in your default browser
+- Tests should be run before committing changes
+- Linting should pass before creating pull requests
+
 ### Original Planning Notes
 
 The original project planning:
