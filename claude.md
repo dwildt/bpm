@@ -16,60 +16,127 @@ Claude Code is an intelligent coding assistant that helps developers:
 
 The project began with a clear request: build a BPM calculator with an 8-bit game aesthetic that can run on GitHub Pages. Claude Code:
 
-### Test-Driven Development
+### Test-Driven Development (TDD)
 
-**IMPORTANT: All new features MUST include unit tests.**
+**CRITICAL: This project follows strict TDD practices. All features MUST be developed with tests.**
 
-When planning and implementing new features:
+#### TDD Workflow (Red-Green-Refactor)
 
-1. **Create tests alongside feature implementation**
-   - Write unit tests for all new functions and logic
-   - Follow existing test patterns in `bpm.test.js` and `metronome.test.js`
-   - Use Jest testing framework (already configured)
+**Before writing any code:**
 
-2. **Test requirements for feature implementation**
+1. **Create GitHub Issue with Test Scenarios**
+   - Document expected behavior
+   - List test scenarios to validate functionality
+   - Include edge cases and error conditions
+   - Example:
+     ```markdown
+     ## Test Scenarios
+     - [ ] Should calculate BPM from tap intervals
+     - [ ] Should reset after 3 seconds of inactivity
+     - [ ] Should handle single tap gracefully
+     - [ ] Should reject negative intervals
+     ```
+
+2. **Write Failing Tests First (RED)**
+   - Create test file before implementation file
+   - Write tests that describe desired behavior
+   - Run tests - they should FAIL (no implementation yet)
+   - Verify tests fail for the right reasons
+
+3. **Implement Minimum Code (GREEN)**
+   - Write simplest code to make tests pass
+   - Focus on functionality, not optimization
+   - Run tests - they should PASS
+   - All existing tests must still pass
+
+4. **Refactor (REFACTOR)**
+   - Clean up code while keeping tests green
+   - Improve structure, naming, performance
+   - Run tests after each refactor
+   - Maintain 100% passing tests
+
+#### Test Requirements
+
+1. **Coverage Targets**
    - Pure logic functions: **100% test coverage required**
    - Business logic (calculations, validations): **Complete test coverage**
    - DOM manipulation: Test when feasible (consider Testing Library for complex cases)
    - Integration points: Add integration tests for workflows
+   - **Minimum project coverage: 85%**
 
-3. **Test organization**
+2. **Test Organization**
    ```
    ├── bpm.js → bpm.test.js
    ├── metronome.js → metronome.test.js
    ├── presets.js → presets.test.js
+   ├── tuner.js → tuner.test.js
    └── [feature].js → [feature].test.js
    ```
 
-4. **Running tests**
-   - `npm test` - Run all tests
-   - `npm run test:watch` - Watch mode during development
-   - `npm run test:coverage` - Check coverage report
+3. **Running Tests**
+   - `npm test` - Run all tests once
+   - `npm run test:watch` - Watch mode during development (use this while coding)
+   - `npm run test:coverage` - Generate coverage report
 
-5. **Before creating pull request or commit**
-   - ✅ All tests pass
-   - ✅ New features have corresponding tests
-   - ✅ Test coverage maintained or improved
-   - ✅ No console errors in test output
+4. **Test Structure Pattern**
+   ```javascript
+   describe('FeatureName', () => {
+     describe('functionName', () => {
+       test('should handle normal case', () => {
+         expect(functionName(input)).toBe(expectedOutput);
+       });
 
-**Example test structure:**
-```javascript
-describe('FeatureName', () => {
-  describe('functionName', () => {
-    test('should handle normal case', () => {
-      expect(functionName(input)).toBe(expectedOutput);
-    });
+       test('should handle edge case', () => {
+         expect(functionName(edgeInput)).toBe(edgeOutput);
+       });
 
-    test('should handle edge case', () => {
-      expect(functionName(edgeInput)).toBe(edgeOutput);
-    });
+       test('should throw error for invalid input', () => {
+         expect(() => functionName(invalid)).toThrow('Error message');
+       });
+     });
+   });
+   ```
 
-    test('should throw error for invalid input', () => {
-      expect(() => functionName(invalid)).toThrow('Error message');
-    });
-  });
-});
-```
+#### Quality Gates - BEFORE Closing Any Issue
+
+**MANDATORY checks before closing an issue or creating a commit:**
+
+1. **✅ All Tests Passing**
+   ```bash
+   npm test
+   # Must show: Tests: X passed, X total
+   # Zero failures allowed
+   ```
+
+2. **✅ No Linting Errors**
+   ```bash
+   npm run lint
+   # Must show: No errors or warnings
+   # Fix all issues before committing
+   ```
+
+3. **✅ Test Coverage Maintained/Improved**
+   ```bash
+   npm run test:coverage
+   # Overall coverage must be ≥ 85%
+   # New files must have ≥ 90% coverage
+   ```
+
+4. **✅ New Features Have Tests**
+   - Every new function must have corresponding tests
+   - Every bug fix must have a regression test
+   - Test both happy path and error cases
+
+5. **✅ No Console Errors**
+   - Check browser console for errors
+   - Test in development mode
+   - Verify no runtime warnings
+
+**Commit will be REJECTED if:**
+- ❌ Any test fails
+- ❌ Linting shows errors
+- ❌ Coverage drops below 85%
+- ❌ New code has no tests
 
 ### Development Commands
 
