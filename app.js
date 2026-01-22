@@ -588,8 +588,8 @@ function updateTunerDisplay() {
     // Update note
     noteDisplay.textContent = state.detectedNote;
 
-    // Update frequency
-    freqDisplay.textContent = `${state.detectedFrequency} Hz`;
+    // Update frequency (round to integer to prevent UI flicker from text wrapping)
+    freqDisplay.textContent = `${Math.round(state.detectedFrequency)} Hz`;
 
     // Update cents
     const centText = state.centOffset >= 0 ? `+${state.centOffset}¢` : `${state.centOffset}¢`;
