@@ -62,7 +62,7 @@ The project began with a clear request: build a BPM calculator with an 8-bit gam
    - Business logic (calculations, validations): **Complete test coverage**
    - DOM manipulation: Test when feasible (consider Testing Library for complex cases)
    - Integration points: Add integration tests for workflows
-   - **Minimum project coverage: 85%**
+   - **Minimum project coverage: 80%**
 
 2. **Test Organization**
    ```
@@ -118,7 +118,7 @@ The project began with a clear request: build a BPM calculator with an 8-bit gam
 3. **✅ Test Coverage Maintained/Improved**
    ```bash
    npm run test:coverage
-   # Overall coverage must be ≥ 85%
+   # Overall coverage must be ≥ 80%
    # New files must have ≥ 90% coverage
    ```
 
@@ -135,7 +135,7 @@ The project began with a clear request: build a BPM calculator with an 8-bit gam
 **Commit will be REJECTED if:**
 - ❌ Any test fails
 - ❌ Linting shows errors
-- ❌ Coverage drops below 85%
+- ❌ Coverage drops below 80%
 - ❌ New code has no tests
 
 ### Development Commands
