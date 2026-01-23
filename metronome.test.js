@@ -6,7 +6,15 @@
 const {
   calculateInterval,
   getFrequencyForBeat,
-  isValidMetronomeBPM
+  isValidMetronomeBPM,
+  getTimeSignatureConfig,
+  getAvailableTimeSignatures,
+  getSubdivisionConfig,
+  getAvailableSubdivisions,
+  calculateSubdivisionInterval,
+  isSubdivisionValidForBPM,
+  getSubdivisionFrequency,
+  isAccentedBeat
 } = require('./metronome.js');
 
 describe('Metronome Logic', () => {
@@ -126,6 +134,165 @@ describe('Metronome Logic', () => {
       // Presto (168-200 BPM)
       expect(calculateInterval(180)).toBeCloseTo(333.33, 2);
       expect(calculateInterval(200)).toBe(300);
+    });
+  });
+
+  // ============================================
+  // Time Signature Tests
+  // ============================================
+
+  describe('getTimeSignatureConfig', () => {
+    test('should return config for 4/4 time signature', () => {
+      const config = getTimeSignatureConfig('4/4');
+      expect(config).toBeDefined();
+      expect(config.beatsPerMeasure).toBe(4);
+      expect(config.primaryAccent).toContain(0);
+    });
+
+    test('should return config for 3/4 time signature', () => {
+      const config = getTimeSignatureConfig('3/4');
+      expect(config).toBeDefined();
+      expect(config.beatsPerMeasure).toBe(3);
+    });
+
+    test('should throw error for invalid time signature', () => {
+      expect(() => getTimeSignatureConfig('5/5')).toThrow('Unknown time signature');
+    });
+  });
+
+  describe('getAvailableTimeSignatures', () => {
+    test('should return array of available time signatures', () => {
+      const signatures = getAvailableTimeSignatures();
+      expect(Array.isArray(signatures)).toBe(true);
+      expect(signatures.length).toBeGreaterThan(0);
+      expect(signatures).toContain('4/4');
+      expect(signatures).toContain('3/4');
+    });
+  });
+
+  describe('isAccentedBeat', () => {
+    test('should return true for downbeat in 4/4', () => {
+      expect(isAccentedBeat(0, '4/4')).toBe(true);
+    });
+
+    test('should return true for downbeat in 3/4', () => {
+      expect(isAccentedBeat(0, '3/4')).toBe(true);
+    });
+
+    test('should return false for non-accented beat', () => {
+      expect(isAccentedBeat(1, '4/4')).toBe(false); // Beat 2 not accented in 4/4
+      expect(isAccentedBeat(2, '4/4')).toBe(false); // Beat 3 not accented
+    });
+  });
+
+  // ============================================
+  // Subdivision Tests
+  // ============================================
+
+  describe('getSubdivisionConfig', () => {
+    test('should return config for quarter note subdivision', () => {
+      const config = getSubdivisionConfig('1/4');
+      expect(config).toBeDefined();
+      expect(config.count).toBe(1);
+      expect(config.label).toContain('Quarter');
+    });
+
+    test('should return config for eighth note subdivision', () => {
+      const config = getSubdivisionConfig('1/8');
+      expect(config).toBeDefined();
+      expect(config.count).toBe(2);
+    });
+
+    test('should return config for sixteenth note subdivision', () => {
+      const config = getSubdivisionConfig('1/16');
+      expect(config).toBeDefined();
+      expect(config.count).toBe(4);
+    });
+
+    test('should return config for triplet subdivision', () => {
+      const config = getSubdivisionConfig('1/3');
+      expect(config).toBeDefined();
+      expect(config.count).toBe(3);
+    });
+
+    test('should throw error for invalid subdivision', () => {
+      expect(() => getSubdivisionConfig('1/5')).toThrow('Unknown subdivision');
+    });
+  });
+
+  describe('getAvailableSubdivisions', () => {
+    test('should return array of available subdivisions', () => {
+      const subdivisions = getAvailableSubdivisions();
+      expect(Array.isArray(subdivisions)).toBe(true);
+      expect(subdivisions.length).toBeGreaterThan(0);
+      expect(subdivisions).toContain('1/4');
+      expect(subdivisions).toContain('1/8');
+      expect(subdivisions).toContain('1/16');
+      expect(subdivisions).toContain('1/3');
+    });
+  });
+
+  describe('calculateSubdivisionInterval', () => {
+    test('should calculate correct interval for quarter notes at 60 BPM', () => {
+      expect(calculateSubdivisionInterval(60, '1/4')).toBe(1000);
+    });
+
+    test('should calculate correct interval for eighth notes at 60 BPM', () => {
+      expect(calculateSubdivisionInterval(60, '1/8')).toBe(500);
+    });
+
+    test('should calculate correct interval for sixteenth notes at 120 BPM', () => {
+      expect(calculateSubdivisionInterval(120, '1/16')).toBe(125);
+    });
+
+    test('should calculate correct interval for triplets at 90 BPM', () => {
+      expect(calculateSubdivisionInterval(90, '1/3')).toBeCloseTo(222.22, 2);
+    });
+  });
+
+  describe('isSubdivisionValidForBPM', () => {
+    test('should return true for quarter notes at any BPM', () => {
+      expect(isSubdivisionValidForBPM('1/4', 60)).toBe(true);
+      expect(isSubdivisionValidForBPM('1/4', 200)).toBe(true);
+    });
+
+    test('should return false for sixteenth notes at very fast BPM (>180)', () => {
+      expect(isSubdivisionValidForBPM('1/16', 250)).toBe(false);
+      expect(isSubdivisionValidForBPM('1/16', 181)).toBe(false);
+    });
+
+    test('should return true for sixteenth notes at moderate BPM', () => {
+      expect(isSubdivisionValidForBPM('1/16', 120)).toBe(true);
+      expect(isSubdivisionValidForBPM('1/16', 180)).toBe(true); // At limit
+    });
+
+    test('should return true for other subdivisions at any BPM', () => {
+      expect(isSubdivisionValidForBPM('1/8', 250)).toBe(true);
+      expect(isSubdivisionValidForBPM('1/3', 300)).toBe(true);
+    });
+  });
+
+  describe('getSubdivisionFrequency', () => {
+    test('should return high frequency for downbeat first subdivision', () => {
+      const result = getSubdivisionFrequency(0, 0, '4/4', '1/8');
+      expect(result.frequency).toBe(1000);
+      expect(result.volume).toBeDefined();
+    });
+
+    test('should return medium frequency for non-downbeat first subdivision', () => {
+      const result = getSubdivisionFrequency(1, 0, '4/4', '1/8');
+      expect(result.frequency).toBe(900);
+    });
+
+    test('should return different frequency for non-first subdivision', () => {
+      const result = getSubdivisionFrequency(0, 1, '4/4', '1/8');
+      expect(result.frequency).toBeLessThan(900);
+    });
+
+    test('should handle sixteenth note subdivisions', () => {
+      const result = getSubdivisionFrequency(0, 2, '4/4', '1/16');
+      expect(result).toHaveProperty('frequency');
+      expect(result).toHaveProperty('volume');
     });
   });
 });

@@ -7,7 +7,7 @@
  * Community contributions welcome via pull requests!
  */
 
-export const FACTORY_PRESETS = [
+const FACTORY_PRESETS = [
   {
     id: 'factory-camila-camila',
     name: '🎵 Camila Camila (Nenhum de Nós)',
@@ -59,3 +59,12 @@ export const FACTORY_PRESETS = [
     description: 'Fast swing feel with triplets'
   }
 ];
+
+// Dual export: CommonJS for tests, ES6 for browser
+if (typeof module !== 'undefined' && module.exports) {
+  // CommonJS export for Jest
+  module.exports = { FACTORY_PRESETS };
+} else {
+  // ES6 export for browser (will be evaluated as global assignment in browser)
+  window.FACTORY_PRESETS = FACTORY_PRESETS;
+}

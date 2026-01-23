@@ -136,8 +136,7 @@ function isSubdivisionValidForBPM(subdivision, bpm) {
  * @param {string} subdivision - Subdivision type (e.g., "1/16")
  * @returns {object} Object with frequency (Hz) and volume properties
  */
-function getSubdivisionFrequency(beatIndex, subdivisionIndex, timeSignature = '4/4', subdivision = '1/4') {
-  const config = getTimeSignatureConfig(timeSignature);
+function getSubdivisionFrequency(beatIndex, subdivisionIndex, _timeSignature = '4/4', subdivision = '1/4') {
   const subdivisionConfig = getSubdivisionConfig(subdivision);
 
   // First subdivision of downbeat (beat 1)

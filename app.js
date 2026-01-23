@@ -2,7 +2,7 @@
 // 8-BIT BPM CALCULATOR
 // ============================================
 
-import { FACTORY_PRESETS } from './presets.js';
+// FACTORY_PRESETS will be loaded from presets.js as a global variable
 
 // State
 const state = {
@@ -280,8 +280,8 @@ function playMetronomeBeat() {
     return;
   }
 
-  // Get frequency and volume based on current beat, subdivision, and time signature
-  const { frequency, volume } = MetronomeLogic.getSubdivisionFrequency(
+  // Get frequency based on current beat, subdivision, and time signature
+  const { frequency } = MetronomeLogic.getSubdivisionFrequency(
     state.currentBeat,
     state.currentSubdivision,
     state.timeSignature,
